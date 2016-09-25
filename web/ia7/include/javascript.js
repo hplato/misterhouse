@@ -1692,8 +1692,8 @@ var object_history = function(items,start,days,time) {
 				
 				$('.update_history').click(function() {
 					console.log ("start="+$('.hist_start').val()+" end="+$('.hist_end').val());
-					var new_start = new Date($('.hist_start').val()).getTime();
-					var new_end = new Date($('.hist_end').val()).getTime();
+					var new_start = new Date($('.hist_start').val().split('-')).getTime();
+					var new_end = new Date($('.hist_end').val().split('-')).getTime();
 					var end_days = (new_start - new_end) / (24 * 60 * 60 * 1000)
 					new_start = new_start / 1000;
 					object_history(items,new_start,end_days);
