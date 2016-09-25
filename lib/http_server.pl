@@ -58,6 +58,12 @@ my %mime_types = (
     'wmlsc' => 'application/vnd.wap.wmlscriptc',
     'wrl'   => 'x-world/x-vrml',
     'json'  => 'application/json',
+    'svg'  => 'image/svg+xml',
+    'otf'  => 'application/font-sfnt',
+    'ttf' => 'application/font-sfnt',
+    'woff'   => 'application/font-woff',
+    'woff2'  => 'application/font-woff2',
+    'eot'  => 'application/vnd.ms-fontobject',
 );
 
 my ( %http_dirs, %html_icons, $html_info_overlib, %password_protect_dirs,
@@ -1680,7 +1686,7 @@ sub html_file {
         print "db web file cache check: f=$file t=$time2/$time3\n"
           if $main::Debug{http};
         if ( $time3 <= $time2 ) {
-            return "HTTP/1.0 304 Not Modified\nServer: MisterHouse\n";
+            return "HTTP/1.0 304 Not Modified\nServer: MisterHouse\n\n";
         }
     }
 

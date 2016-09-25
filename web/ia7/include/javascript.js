@@ -267,12 +267,14 @@ function changePage (){
 				nav_link = '#path=/objects&parents='+nav_name;				
 				if (collection_keys_arr.length > 2 && collection_keys_arr[collection_keys_arr.length-2].substring(0,1) == "$") nav_link = '#path=/objects&type='+nav_name; 
 				if (nav_name == "Group") nav_link = '#path=objects&type=Group'; //Hardcode this use case
-				if (json_store.objects[nav_name].label !== undefined) nav_name = (json_store.objects[nav_name].label);
+				if (json_store.object && sjson_store.objects[nav_name].label !== undefined) nav_name = (json_store.objects[nav_name].label);
 
 			}
-			else {
-				nav_link = json_store.collections[collection_keys_arr[i]].link;
-				nav_name = json_store.collections[collection_keys_arr[i]].name;
+            else {
+                if (json_store.collections && collection_keys_arr[i]){
+                    nav_link = json_store.collections[collection_keys_arr[i]].link;
+                    nav_name = json_store.collections[collection_keys_arr[i]].name;
+                }
 			}
 			nav_link = buildLink (nav_link, breadcrumb + collection_keys_arr[i]);
 			breadcrumb += collection_keys_arr[i] + ",";
@@ -1690,8 +1692,8 @@ var object_history = function(items,start,days,time) {
 				
 				$('.update_history').click(function() {
 					console.log ("start="+$('.hist_start').val()+" end="+$('.hist_end').val());
-					var new_start = new Date($('.hist_start').val()).getTime();
-					var new_end = new Date($('.hist_end').val()).getTime();
+					var new_start = new Date($('.hist_start').val().split('-')).getTime();
+					var new_end = new Date($('.hist_end').val().split('-')).getTime();
 					var end_days = (new_start - new_end) / (24 * 60 * 60 * 1000)
 					new_start = new_start / 1000;
 					object_history(items,new_start,end_days);
@@ -1722,15 +1724,15 @@ var object_history = function(items,start,days,time) {
         					for (var i = 0; i < json.data.data.length; i++) {
             					if (json.data.data[i].label == key) {
                 					data.push(json.data.data[i]);
-                				return true;
+                                    return true;
            		 				}
        		 				}
     					});
     					// take away the border so that it looks better and span the graph from start to end.
     					json.data.options.grid.borderWidth = 0;
 
-    					json.data.options.xaxis.min = new Date($('.hist_end').val()).getTime();
-                		json.data.options.xaxis.max = new Date($('.hist_start').val()).getTime() + (24 * 60 * 60 * 1000);
+					json.data.options.xaxis.min = new Date($('.hist_end').val().split('-')).getTime();
+				json.data.options.xaxis.max = new Date($('.hist_start').val().split('-')).getTime() + (24 * 60 * 60 * 1000);
 //console.log("data="+JSON.stringify(data));
 //console.log("xmin="+json.data.options.xaxis.min+" xmax="+json.data.options.xaxis.max);
     					$.plot($("#hist-graph"), data, json.data.options);
@@ -1833,6 +1835,7 @@ var fp_display_height=0; // updated by fp_resize_floorplan_image
 var fp_scale = 100; // updated by fp_reposition_entities
 var fp_grabbed_entity = null; // store item for drag & drop
 var fp_icon_select_item_id = null; // store item id on right click for icon set selection
+var fp_icon_image_size = 48;
 
 var noDragDrop = function() {
     return false;
@@ -1884,7 +1887,8 @@ var fp_resize_floorplan_image = function(){
 
 var fp_reposition_entities = function(){
     var t0 = performance.now();
-    var offset = $("#fp_graphic").offset();
+    var fp_graphic_offset = $("#fp_graphic").offset();
+    console.log("fp_graphic_offset: "+ JSON.stringify(fp_graphic_offset));
     var width = fp_display_width;
     var hight = fp_display_height;
     var onePercentWidthInPx = width/100;
@@ -1892,8 +1896,8 @@ var fp_reposition_entities = function(){
     var fp_get_offset_from_location = function(item) {
         var y = item[0];
         var x = item[1];
-        var newy = offset.top +  y * onePercentHeightInPx;
-        var newx = offset.left +  x * onePercentWidthInPx;
+        var newy = fp_graphic_offset.top +  y * onePercentHeightInPx;
+        var newx = fp_graphic_offset.left +  x * onePercentWidthInPx;
         return {
             "top": newy,
             "left": newx
@@ -1918,15 +1922,15 @@ var fp_reposition_entities = function(){
     } else {
     	nwidth = 790;
     }
-
-    fp_scale = Math.round( width/nwidth * 100);
+    var fp_scale =  width/nwidth;
+    var fp_scale_percent = Math.round( fp_scale * 100);
     
-	console.log("width="+width+" nwidth="+nwidth+" scale="+fp_scale);
+	console.log("width="+width+" nwidth="+nwidth+" scale="+fp_scale_percent);
     // update the location of all the objects...
     $(".floorplan_item").each(function(index) {
         var classstr = $(this).attr("class");
         var coords = classstr.split(/coords=/)[1];
-        $(this).width(fp_scale + "%");
+        $(this).width(fp_scale_percent + "%");
 
         if (coords.length === 0){
             return;
@@ -1942,13 +1946,13 @@ var fp_reposition_entities = function(){
         // } else {
         //     $(this).attr('src',$(this).attr('src').replace('32.png','48.png'));
         // }
-
-        var adjust = $(this).width()/2;
+        var element_id = $(this).attr('id');
+        var adjust = fp_icon_image_size*fp_scale/2;
         var fp_off_center = {
             "top":  fp_offset.top - adjust,
             "left": fp_offset.left - adjust
         };
-        fp_set_pos($(this).attr('id'), fp_off_center);
+        fp_set_pos(element_id, fp_off_center);
     });
 
 	$('.icon_select img').each(function(){
@@ -2062,14 +2066,14 @@ var floorplan = function(group,time) {
             if (fp_grabbed_entity === null)
                 return;
 
-            set_set_coordinates_from_offset(fp_grabbed_entity.id);
+            set_coordinates_from_offset(fp_grabbed_entity.id);
             fp_reposition_entities();
             fp_grabbed_entity = null;
         });
 
     }
 
-    var set_set_coordinates_from_offset = function (id)
+    var set_coordinates_from_offset = function (id)
     {
         var E = $('#'+id);
         var offsetE = E.offset();
@@ -2403,14 +2407,13 @@ var get_fp_image = function(item,size,orientation) {
   	var image_name;
 	var image_color = getButtonColor(item.state);
 	var baseimg_width = $(window).width();
-	var image_size = "48";
-  //	if (baseimg_width < 500) image_size = "32" // iphone scaling
-  	//kvar image_size = "32"
+  //	if (baseimg_width < 500) fp_icon_image_size = "32" // iphone scaling
+	//kvar fp_icon_image_size = "32"
  	if (item.fp_icons !== undefined) {
  		if (item.fp_icons[item.state] !== undefined) return item.fp_icons[item.state];
  	}
  	if (item.fp_icon_set !== undefined) {
-  		return "fp_"+item.fp_icon_set+"_"+image_color+"_"+image_size+".png";
+		return "fp_"+item.fp_icon_set+"_"+image_color+"_"+fp_icon_image_size+".png";
  	} 	
  	//	if item.fp_icons.return item.fp_icons[state];
 	if(item.type === "Light_Item" || item.type === "Fan_Light" ||
@@ -2422,25 +2425,25 @@ var get_fp_image = function(item,size,orientation) {
 		item.type === "UIO_Item" || item.type === "X10_Item" ||
 		item.type === "xPL_Plugwise" || item.type === "X10_Appliance") {
 
-  			return "fp_light_"+image_color+"_"+image_size+".png";
+			return "fp_light_"+image_color+"_"+fp_icon_image_size+".png";
   	}
   	
 	if(item.type === "Motion_Item" || item.type === "X10_Sensor" ||
 		item.type === "Insteon::MotionSensor" ) {
-  			return "fp_motion_"+image_color+"_"+image_size+".png";
+			return "fp_motion_"+image_color+"_"+fp_icon_image_size+".png";
 
   	}
   	
 	if(item.type === "Door_Item" || item.type === "Insteon::IOLinc_door") {
-  			return "fp_door_"+image_color+"_"+image_size+".png";
+			return "fp_door_"+image_color+"_"+fp_icon_image_size+".png";
 
   	}  	
 
 	if(item.type === "FPCamera_Item" ) {
- 			return "fp_camera_default_"+image_size+".png";
+			return "fp_camera_default_"+fp_icon_image_size+".png";
  		}
   	
-  	return "fp_unknown_info_"+image_size+".png";
+	return "fp_unknown_info_"+fp_icon_image_size+".png";
 };
 
 var create_img_popover = function(entity) {

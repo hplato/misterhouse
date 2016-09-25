@@ -1,0 +1,3697 @@
+# List of X10_Item objects
+use vars qw($backyard_light $bedroom_light1 $bedroom_light2 $garage_light $test_light1 $test_light2);
+
+# List of X10_Appliance objects
+use vars qw($fountain);
+
+# List of Voice_Cmd objects
+use vars qw($my_test1 $organizer_check $restart_tts $test_speak_mode $test_speech_flags $test_volume $v_clear_cache $v_debug $v_debug_toggle $v_fountain $v_garage_light $v_get_ical_data $v_http_control $v_list_debug_options $v_list_serial_items $v_list_voice_cmds $v_list_x10_items $v_listen $v_mhdl_page $v_mode $v_mode_toggle $v_read_tables $v_reboot $v_reboot_abort $v_reload_code $v_reload_code2 $v_repeat_last_spoken $v_restart_mh $v_set_password $v_show_debug $v_speed_benchmark $v_test_light2 $v_test_lights $v_undo_last_change $v_update_docs $v_uptime $v_version $v_voice_cmds_help $v_what_speed);
+
+# List of Timer objects
+use vars qw($mh_speakers_timer $timer_speed_check $x10_backlog_timer);
+
+# List of Socket_Item objects
+use vars qw($http_monitor $mhsend_server);
+
+# List of Serial_Item objects
+use vars qw($motion $motion_unit $test_button);
+
+# List of Process_Item objects
+use vars qw($p_ical2vsdb $p_mhdl_date_page $p_mhdl_page $p_update_docs);
+
+# List of Organizer_Events objects
+use vars qw($organizer_events $organizer_holidays $organizer_vacation);
+
+# List of Group objects
+use vars qw($All_Lights $Appliances $Backyard $BedRoom $Garage $LivingRoom $Motion $Property);
+
+# List of Generic_Item objects
+use vars qw($Power_Supply $eliza_card $eliza_data $eliza_rule $eliza_voice $eliza_wavcomp $mh_speakers $mh_volume $mode_mh $mode_occupied $mode_security $mode_sleeping $run_command $search_code_string $search_command_string);
+
+# List of File_Item objects
+use vars qw($_organizer_cal $_organizer_todo $f_eliza_deep_thoughts);
+
+$Garage                              =  new Group;
+$Garage                              -> set_fp_location(0,0,20,20);
+$Property                            =  new Group;
+$Property                            -> add($Garage);
+$LivingRoom                          =  new Group;
+$LivingRoom                          -> set_fp_location(20,0,20,20);
+$Property                            -> add($LivingRoom);
+$BedRoom                             =  new Group;
+$BedRoom                             -> set_fp_location(40,0,15,20);
+$Property                            -> add($BedRoom);
+$Backyard                            =  new Group;
+$Backyard                            -> set_fp_location(0,20,55,10);
+$Property                            -> add($Backyard);
+$garage_light                        =  new X10_Item('A1', );
+$All_Lights                          =  new Group;
+$All_Lights                          -> add($garage_light);
+$garage_light                        -> set_fp_location(10,10,1,1);
+$Garage                              -> add($garage_light);
+$test_light1                         =  new X10_Item('B1', );
+$All_Lights                          -> add($test_light1);
+$test_light1                         -> set_fp_location(5,15,1,1);
+$LivingRoom                          -> add($test_light1);
+$test_light2                         =  new X10_Item('B2', );
+$All_Lights                          -> add($test_light2);
+$test_light2                         -> set_fp_location(15,5,1,1);
+$LivingRoom                          -> add($test_light2);
+$bedroom_light1                      =  new X10_Item('C1', );
+$All_Lights                          -> add($bedroom_light1);
+$bedroom_light1                      -> set_fp_location(5,15,1,1);
+$BedRoom                             -> add($bedroom_light1);
+$bedroom_light2                      =  new X10_Item('C1', );
+$All_Lights                          -> add($bedroom_light2);
+$bedroom_light2                      -> set_fp_location(10,10,1,1);
+$BedRoom                             -> add($bedroom_light2);
+$fountain                            =  new X10_Appliance('D1', );
+$Appliances                          =  new Group;
+$Appliances                          -> add($fountain);
+$fountain                            -> set_fp_location(30,2,1,1);
+$Backyard                            -> add($fountain);
+$backyard_light                      =  new X10_Item('D2', );
+$All_Lights                          -> add($backyard_light);
+$backyard_light                      -> set_fp_location(55,5,1,1);
+$Backyard                            -> add($backyard_light);
+my $v_garage_light_state;
+$v_garage_light = new Voice_Cmd("Garage light [ON,OFF,BRIGHT,DIM]");
+my $v_fountain_state;
+$v_fountain = new Voice_Cmd("Fountain [ON,OFF]");
+$motion                              =  new Serial_Item('XPJ', 'on');
+$Motion                              =  new Group;
+$Motion                              -> add($motion);
+$motion                              -> add ('XPK', 'off');
+$motion_unit                         =  new Serial_Item('XP6', 'computer room');
+$Motion                              -> add($motion_unit);
+$motion_unit                         -> add ('XP7', 'BedRoom');
+$motion_unit                         -> add ('XP8', 'BedRoom dark');
+$v_what_speed = new Voice_Cmd 'What is your [max,normal] speed';
+$v_what_speed->set_info(
+    'Runs mh at max speed for a few seconds, then reports Passes Per Second');
+$timer_speed_check = new Timer;
+my $speed_benchmark_count = 0;
+$v_speed_benchmark =
+  new Voice_Cmd '[Start a by name,Start a by speed,Stop the] speed benchmark';
+$v_speed_benchmark->set_info(
+    'This will suspend normal mh while it benchmarks each code member individually. It can take few minutes.'
+);
+$eliza_rule    = new Generic_Item;
+$eliza_data    = new Generic_Item;
+$eliza_voice   = new Generic_Item;
+$eliza_card    = new Generic_Item;
+$eliza_wavcomp = new Generic_Item;
+$eliza_data->set_authority('anyone');
+$eliza_rule->set_authority('anyone');
+$eliza_voice->set_authority('anyone');
+$eliza_card->set_authority('anyone');
+$eliza_wavcomp->set_authority('anyone');
+my ($eliza);
+$f_eliza_deep_thoughts =
+  new File_Item("$config_parms{data_dir}/remarks/deep_thoughts.txt");
+$v_reload_code = new Voice_Cmd("{Reload,re load} code");
+$v_reload_code->set_info('Load mh.ini, icon, and/or code changes');
+$v_reload_code->tie_event('push(@Nextpass_Actions, \&read_code)');    # noloop
+$v_reload_code2 = new Voice_Cmd("Force {Reload,re load} code");
+$v_reload_code2->set_info('Force a code reload of all modules');
+# noloop=start
+$v_reload_code2->tie_event('push(@Nextpass_Actions,\&read_code_forced)');
+
+# noloop=stop
+$v_listen = new Voice_Cmd( "[Start,Stop] listening", 0 );
+$v_listen->tie_event('&handle_listen_state()');    # noloop
+$v_read_tables = new Voice_Cmd 'Read table files';
+$v_read_tables->tie_event('&read_table_files()');    # noloop
+$v_set_password = new Voice_Cmd("Set the [guest,family,admin] password");
+$v_set_password->tie_event('&handle_set_password_state()');    # noloop
+$v_uptime = new Voice_Cmd( "What is your up time", 0 );
+$v_uptime->set_info(
+    'Check how long the comuter and MisterHouse have been running');
+$v_uptime->set_authority('anyone');
+$v_uptime->tie_event('&handle_uptime_state()');    # noloop
+$v_http_control = new Voice_Cmd '[Open,Close,Restart,Check] the http server';
+$v_http_control->tie_event('&handle_http_control_state()');    # noloop
+$http_monitor = new Socket_Item( undef, undef,
+    "$config_parms{http_server}:$config_parms{http_port}" );
+$v_restart_mh = new Voice_Cmd '[Restart,Exit] Mister House';
+$v_restart_mh->set_info( 'Restarts/Exits Misterhouse.  This will only work if '
+      . 'you start with mh/bin/mhl' )
+  if !$OS_win;
+$v_restart_mh->set_info('Restarts/Exits Misterhouse.') if $OS_win;
+$v_restart_mh->tie_event('&restart_mh($state)');    # noloop
+$v_reboot = new Voice_Cmd '[Reboot,Shut Down] the computer';
+$v_reboot->set_info('Do this only if you really mean it!  Windows only');
+$v_reboot->tie_event('&handle_reboot_state()');    # noloop
+$v_reboot_abort = new Voice_Cmd("Abort the reboot");
+$v_reboot_abort->tie_event('&handle_reboot_abort_state()');    # noloop
+my $debug_str =
+    $config_parms{debug_options}
+  ? $config_parms{debug_options}
+  : "X10,serial,http,misc,startup,socket,password,user_code,weather";
+$v_debug = new Voice_Cmd("Set debug for [$debug_str,none]");
+$v_debug->set_info('Adds the given module to the current set of debug flags');
+$v_debug->tie_event('&handle_debug_state()');    # noloop
+$v_debug_toggle = new Voice_Cmd "Toggle debug for [$debug_str]";
+$v_debug_toggle->set_info(
+    'Toggles what kind of debugging information is logged');
+$v_debug_toggle->tie_event('&handle_debug_toggle_state()');    # noloop
+$v_show_debug = new Voice_Cmd('Show debug');
+$v_show_debug->set_info('Shows the currently active debug flags');
+$v_show_debug->tie_event('&handle_show_debug_state()');    # noloop
+$v_mode = new Voice_Cmd("Put house in [normal,mute,offline] mode");
+$v_mode->set_info( 'mute mode disables all speech and sound.  '
+      . 'offline disables all serial control' );
+$v_mode->tie_event('&handle_mode_state()');    # noloop
+$v_mode_toggle = new Voice_Cmd("Toggle the house mode");
+$v_mode_toggle->tie_event('&handle_mode_toggle_state()');    # noloop
+$search_code_string = new Generic_Item;
+$search_code_string->set_icon('mh.jpg');                                # noloop
+$search_code_string->tie_event('&handle_search_code_string_state()');   # noloop
+$v_list_voice_cmds = new Voice_Cmd 'List voice commands';
+$v_list_voice_cmds->set_info('Display a list of valid voice commands');
+$v_voice_cmds_help = new Voice_Cmd 'Voice commands help';
+$v_voice_cmds_help->set_info('Display help text for all voice commands');
+$v_voice_cmds_help->tie_event('&handle_voice_cmds_help_state()');    # noloop
+$v_list_x10_items = new Voice_Cmd 'List {X 10,X10} items', 0;
+$v_list_x10_items->set_info(
+    'Generates a report fo all X10 items, sorted by device code');
+$v_list_x10_items->tie_event('&handle_list_x10_items_state()');    # noloop
+$v_list_serial_items = new Voice_Cmd 'List serial items';
+$v_list_serial_items->set_info(
+    'Generates a report of all Serial_Items, sorted by serial state');
+$v_list_serial_items->tie_event('&handle_list_serial_items_state()');   # noloop
+$v_list_debug_options = new Voice_Cmd 'List debug options';
+$v_list_debug_options->set_info( 'Generates a list of the various -debug '
+      . 'options you can use to get debug errata' );
+$v_list_debug_options->tie_event('&handle_list_debug_options_state()'); # noloop
+$Power_Supply = new Generic_Item;
+$x10_backlog_timer = new Timer;
+$v_repeat_last_spoken =
+  new Voice_Cmd '{Repeat your last message, What did you say}', '';
+$v_repeat_last_spoken->tie_event('&handle_repeat_last_spoken_state()'); # noloop
+$v_clear_cache = new Voice_Cmd 'Clear the web cache directory', '';
+$v_clear_cache->set_info(
+    'Delete all the auto-generated .jpg files in html_alias_cache directory');
+$v_clear_cache->tie_event('&handle_clear_cache_state()');    # noloop
+$run_command = new Generic_Item;
+$run_command->tie_event('&handle_run_command_state()');    # noloop
+$search_command_string = new Generic_Item;
+# noloop=start
+$search_command_string->tie_event('&handle_search_command_string_state()');
+
+# noloop=stop
+$v_undo_last_change = new Voice_Cmd 'Undo the last action';
+$v_undo_last_change->set_info(
+    'Changes the most recently changed item back to its previous state');
+$v_undo_last_change->tie_event('&handle_undo_last_change_state()');    # noloop
+$mode_mh = new Generic_Item;
+$mode_mh->tie_event('&handle_mode_mh_state()');    # noloop
+$mode_security = new Generic_Item;
+$mode_security->tie_event('&handle_mode_security_state()');    # noloop
+$mode_occupied = new Generic_Item;
+$mode_sleeping = new Generic_Item;
+$mode_sleeping->tie_event('&handle_mode_sleeping_state()');    # noloop
+$v_update_docs = new Voice_Cmd "Update the Documentation";
+$p_update_docs = new Process_Item "update_docs";
+$v_update_docs->tie_event('start $p_update_docs');    # noloop
+$v_update_docs->set_icon('mh.jpg');                   # noloop
+# noloop=start
+&trigger_set(
+    "time_cron('5 4 * * *')",
+    "run_voice_cmd 'Update the Documentation'",
+    'NoExpire',
+    'update the documentation'
+) unless &trigger_get('update the documentation');
+
+# noloop=stop
+# noloop=start
+my $mhdl_url  = "https://api.github.com/repos/hollie/misterhouse/tags";
+my $mhdl_file = "$config_parms{data_dir}/web/mh_download.html";
+$p_mhdl_page = new Process_Item("get_url -quiet \"$mhdl_url\" \"$mhdl_file\"");
+
+my $mhdl_date_url  = "";
+my $mhdl_date_file = "$config_parms{data_dir}/web/mh_download_date.html";
+$p_mhdl_date_page = new Process_Item;
+
+# noloop=stop
+$v_mhdl_page = new Voice_Cmd("Check Misterhouse version");
+$v_mhdl_page->set_info("Check if Misterhouse version is current");
+$v_version = new Voice_Cmd( "What version are you", 0 );
+$v_version->set_info("Responds with current version information");
+$mh_volume            = new Generic_Item;
+$mh_speakers          = new Generic_Item;
+$mh_speakers_timer    = new Timer;
+# noloop=start
+
+&set_volume_master_wrapper( $mh_volume->{state} )
+  if $Startup and defined $mh_volume->{state};
+&set_volume_wav( $config_parms{volume_wav_default_volume} )
+  if $Startup and defined $config_parms{volume_wav_default_volume};
+
+if ( defined( $state = state_now $mh_volume) and $state ne '' ) {
+    &set_volume_master_wrapper($state);
+}
+
+my $volume_master_changed = 0;
+my $volume_wav_previous;
+
+# noloop=start
+
+$Tk_objects{sliders}{volume} = &tk_scalebar( \$mh_volume, 0, 'Volume' )
+  if $MW
+  and $Reload
+  and $Run_Members{mh_sound};
+
+if ( $MW and $Reload ) {
+    my $volume_temp = 0;
+    $volume_temp = $mh_volume->{state} if defined $mh_volume->{state};
+    if ( $Tk_objects{fb4} ) {
+        $Tk_objects{volume_status} = $Tk_objects{fb4}->ProgressBar(
+            -from   => 0,
+            -to     => 100,
+            -value  => $volume_temp,
+            -width  => 20,
+            -blocks => 12
+        )->pack(qw/-side left -padx 2/);
+        &configure_element( 'progress', \$Tk_objects{volume_status}, 1 );
+    }
+
+}
+
+# Detect if we are speaking or not
+# Note, a call to is_speaking seems to be expensive on Windows
+#  -  mip meter drops from 220 to 170 with this call :(
+# Call it every 250 ms
+my ( $is_speaking, $is_speaking_flag );
+$is_speaking = &Voice_Text::is_speaking if $New_Msecond_250;
+
+#$is_speaking = 1 if active $mh_speakers_timer;
+
+# Eureka! This all FINALLY works with everything (sliders, status, Windows, Winamp DJ, etc.)
+
+sub put_volume_back {
+    my $wav_did_it = shift;
+    if ($wav_did_it) {
+        if ( !$is_speaking_flag ) {
+            set $mh_speakers OFF
+              ;    # don't turn speakers off if talking (WAV likely a chime)
+        }
+    }
+    else {
+
+        $is_speaking_flag = 0;
+        set $mh_speakers OFF;
+    }
+
+    # MSv5 has nothing to do with the mixer
+
+    if ( defined $config_parms{volume_wav_default_volume}
+        and ( $Voice_Text::VTxt_version ne 'msv5' or $wav_did_it ) )
+    {
+        print_log(
+            "Putting wav volume back to $config_parms{volume_wav_default_volume}"
+        );
+        &set_volume_wav( $config_parms{volume_wav_default_volume} );
+
+        if ($volume_master_changed) {
+            $volume_master_changed = 0;
+            &set_volume_master_wrapper( $mh_volume->{state} );
+        }
+
+    }
+
+}
+
+if ( !$is_speaking_flag and $is_speaking ) {
+
+    #   print_log 'Speakers on';
+    $is_speaking_flag = 1;
+    print_log "Setting speakers ON";
+    set $mh_speakers ON;
+
+    # The following has no effect :(
+    #   &Voice_Cmd::deactivate if $OS_win; # So mh does not listen to itself
+}
+if ( $is_speaking_flag and !$is_speaking ) {
+
+    # *** v5 has nothing to do with the mixer
+
+    print_log "Speakers off, volume reset to $volume_wav_previous"
+      if defined $volume_wav_previous and $Voice_Text::VTxt_version ne 'msv5';
+    &put_volume_back();
+
+}
+
+$test_volume = new Voice_Cmd 'Test volume at [5,20,60,100]';
+$test_volume->tie_event(
+    '$test_volume->respond("volume=$state Testing volume at $state%")');
+
+# Currently, this only works with the MS Voice TTS
+$test_speak_mode = new Voice_Cmd
+  'Set speech to [stop,pause,resume,rewind,fastforward,fast,normal,slow,-5,5]';
+$test_speak_mode->tie_event('speak mode => $state');
+
+# Currently, this only works with the MS Voice TTS
+$test_speech_flags = new Voice_Cmd 'Test [xml,sable] speech tags';
+if ( $state = said $test_speech_flags) {
+    respond "$Pgm_Root/docs/ms_speech_xml_example.txt" if $state eq 'xml';
+    respond "engine=festival $Pgm_Root/docs/festival_speech_example.sable"
+      if $state eq 'sable';
+}
+
+$Tk_objects{volume_status}->configure( -value => $mh_volume->{state} )
+  if $Tk_objects{volume_status} and ( state_now $mh_volume);
+
+sub set_volume_master {
+    my ($volume) = @_;
+
+    if ( $Info{Volume_Control} eq 'Command Line' ) {
+        my $volume_cmd = $config_parms{volume_master_set_cmd};
+        print_log eval qq("$volume_cmd");
+        my $r = system eval qq("$volume_cmd");
+    }
+}
+
+sub set_volume_master_wrapper {
+    my $state = shift;
+    if ( !$Info{Volume_Control} ) {
+        print_log "Volume control not enabled";
+        return;
+    }
+    elsif ( $state < 0 or $state > 100 ) {
+        $state = 100;
+        set $mh_volume 100;
+    }
+    else {
+        print_log "Setting master volume to $state";
+        &set_volume_master($state);
+    }
+    $Tk_objects{volume_status}->configure( -value => $state )
+      if $Tk_objects{volume_status};
+
+}
+
+sub set_volume_wav {
+    my ($volume) = @_;
+    my $volume_wav_previous;
+    if ( $Info{Volume_Control} eq 'Command Line' ) {
+        print_log "$config_parms{volume_wav_get_cmd}";
+        $volume_wav_previous = `$config_parms{volume_wav_get_cmd}`;
+        chomp $volume_wav_previous;
+        my $volume_cmd = $config_parms{volume_wav_set_cmd};
+        print_log eval qq("$volume_cmd");
+        my $r = system eval qq("$volume_cmd");
+    }
+    print_log "Previous wav volume was $volume_wav_previous";
+
+    #return $volume_wav_previous;
+}
+
+# Set hooks so set_volume is called whenever speak or play is called
+&Speak_pre_add_hook( \&set_volume_pre_hook ) if $Reload;
+&Play_pre_add_hook( \&set_volume_pre_hook )  if $Reload;
+
+sub set_volume_pre_hook {
+    print_log "FUNCTION: set_volume_pre_hook";
+    return
+      if $is_speaking
+      and $Voice_Text::VTxt_version ne
+      'msv5';    # Speaking volume wins over play volume (unless using MSv5!)
+    return
+      unless $Info{Volume_Control}
+      ;          # Verify we have a volume control module installed
+    my %parms = @_;
+
+    # msv5 changes volume with xml tags in lib/Voice_Text.pm
+    return if $parms{text} and $Voice_Text::VTxt_version eq 'msv5';
+
+    undef $volume_wav_previous;
+    my $volume = $parms{volume};
+    my $mode   = $parms{mode};
+
+    # *** Oops the following line is wrong--mh_volume is linked to mixer
+    # Not to be used as the default for playing WAV's, speaking, etc.
+
+    #$volume = $mh_volume->{state} unless $volume;
+    return unless $volume;
+
+    unless ($mode) {
+        if ( defined $mode_mh ) {    # *** Outdated (?)
+            $mode = state $mode_mh;
+        }
+        else {
+            $mode = $Save{mode};
+        }
+    }
+    return if $mode eq 'mute' or $mode eq 'offline';
+
+    # Set a timer since we can not detect when a wav file is done
+    if ( $parms{time} ) {
+        set $mh_speakers_timer $parms{time},
+          '&put_volume_back(1)';     # flag to say WAV did it!
+    }
+
+    if ( $parms{time}
+        or ( $parms{text} and $Voice_Text::VTxt_version ne 'msv5' ) )
+    {
+        print_log "Setting wav volume to $volume";
+        $volume = 100 if $volume > 100;
+
+        $volume_wav_previous = &set_volume_wav($volume);
+
+        if ( $parms{mhvolume} ) {
+            $volume_master_changed = 1;
+            &set_volume_master_wrapper( $parms{mhvolume} );
+        }
+
+    }
+}
+
+# Allow for a pre-speak/play wav file
+&Speak_pre_add_hook( \&sound_pre_speak )
+  if $Reload and $config_parms{sound_pre_speak};
+&Play_pre_add_hook( \&sound_pre_play )
+  if $Reload and $config_parms{sound_pre_play};
+
+sub sound_pre_speak {
+    my %parms = @_;
+    return if $parms{no_pre};
+    play mode => 'wait', no_pre => 1, file => $config_parms{sound_pre_speak};
+
+    # ***  Config parm for this pause!
+
+    #&sleep_time(400); # So the TTS engine doesn't grab the sound card first
+}
+
+sub sound_pre_play {
+    my %parms = @_;
+    return if $parms{no_pre};
+    play mode => 'wait', no_pre => 1, file => $config_parms{sound_pre_play};
+}
+
+# Allow for restarting of TTS engine
+$restart_tts = new Voice_Cmd 'Restart the TTS engine';
+$restart_tts->set_info(
+    'This will restart the voice Text To Speech engine, in case it died for some reason'
+);
+
+&Voice_Text::init if said $restart_tts;
+$mhsend_server = new Socket_Item( undef, undef, 'server_mhsend' );
+$organizer_holidays = new Organizer_Events('holiday');
+$organizer_vacation = new Organizer_Events('vacation');
+$organizer_events   = new Organizer_Events('events');
+$organizer_check = new Voice_Cmd 'Check for new calendar events';
+$organizer_check->set_info(
+    'Creates MisterHouse events based on organizer calendar events');
+$p_ical2vsdb = new Process_Item();
+$v_get_ical_data = new Voice_Cmd('[Retrieve,Force,Purge] iCal data');
+$v_get_ical_data->set_info('Retrieve iCal calendar data from multiple sources');
+$v_get_ical_data->set_authority('anyone');
+my $speak_tasks = 1;
+$_organizer_cal  = new File_Item "$config_parms{organizer_dir}/calendar.tab";
+$_organizer_todo = new File_Item "$config_parms{organizer_dir}/tasks.tab";
+my %_organizer_emails;
+my @_organizer_announce_day_times = ( '8 am', '12 pm', '7 pm' );
+my @_organizer_announce_priorday_times = ('7 pm');
+my $_ical2db_output_dir  = "$config_parms{organizer_dir}";
+my $_ical2db_config_path = "$_ical2db_output_dir/i2v.cfg";
+my $calOk  = 0;    # flag to indicate if the vsdb is ok
+my $todoOk = 0;
+my $ical_read_interval =
+  ( $main::config_parms{ical_read_interval} )
+  ? $main::config_parms{ical_read_interval}
+  : 0;
+my $eye_pos = 0;
+my $eye_dir = 1;
+#noloop=start
+if ($MW) {
+    $Tk_objects{eye}->destroy()      if defined( $Tk_objects{eye} );
+    $Tk_objects{eye_photo}->delete() if defined( $Tk_objects{eye_photo} );
+    $Tk_objects{eye_photo} =
+      $Tk_objects{menu_bar}->Photo( -file => "$Pgm_Path/../docs/mh_logo.gif" );
+    $Tk_objects{eye} = $Tk_objects{menu_bar}->Label(
+        -height => 16,
+        -width  => 16,
+        -image  => $Tk_objects{eye_photo},
+        -relief => 'sunken'
+    )->pack(qw/-side right -anchor e/);
+
+    #&tk_mlabel(\$Tk_objects{eye});
+}
+
+#noloop=stop
+$my_test1 = new Voice_Cmd 'Run test [1,2,3]';
+my $light_states = 'on,brighten,dim,off';
+my $state;
+$v_test_light2 = new Voice_Cmd("Turn test light 2 [$light_states]");
+$v_test_lights = new Voice_Cmd("All lights [$light_states]");
+$test_button = new Serial_Item('XA2');
+&main::register_object_by_name('$Garage',$Garage);
+$Garage->{category} = "Other";
+$Garage->{filename} = "test_table";
+$Garage->{object_name} = '$Garage';
+&main::register_object_by_name('$Property',$Property);
+$Property->{category} = "Other";
+$Property->{filename} = "test_table";
+$Property->{object_name} = '$Property';
+&main::register_object_by_name('$LivingRoom',$LivingRoom);
+$LivingRoom->{category} = "Other";
+$LivingRoom->{filename} = "test_table";
+$LivingRoom->{object_name} = '$LivingRoom';
+&main::register_object_by_name('$BedRoom',$BedRoom);
+$BedRoom->{category} = "Other";
+$BedRoom->{filename} = "test_table";
+$BedRoom->{object_name} = '$BedRoom';
+&main::register_object_by_name('$Backyard',$Backyard);
+$Backyard->{category} = "Other";
+$Backyard->{filename} = "test_table";
+$Backyard->{object_name} = '$Backyard';
+&main::register_object_by_name('$garage_light',$garage_light);
+$garage_light->{category} = "Other";
+$garage_light->{filename} = "test_table";
+$garage_light->{object_name} = '$garage_light';
+&main::register_object_by_name('$All_Lights',$All_Lights);
+$All_Lights->{category} = "Other";
+$All_Lights->{filename} = "test_table";
+$All_Lights->{object_name} = '$All_Lights';
+&main::register_object_by_name('$test_light1',$test_light1);
+$test_light1->{category} = "Other";
+$test_light1->{filename} = "test_table";
+$test_light1->{object_name} = '$test_light1';
+&main::register_object_by_name('$test_light2',$test_light2);
+$test_light2->{category} = "Other";
+$test_light2->{filename} = "test_table";
+$test_light2->{object_name} = '$test_light2';
+&main::register_object_by_name('$bedroom_light1',$bedroom_light1);
+$bedroom_light1->{category} = "Other";
+$bedroom_light1->{filename} = "test_table";
+$bedroom_light1->{object_name} = '$bedroom_light1';
+&main::register_object_by_name('$bedroom_light2',$bedroom_light2);
+$bedroom_light2->{category} = "Other";
+$bedroom_light2->{filename} = "test_table";
+$bedroom_light2->{object_name} = '$bedroom_light2';
+&main::register_object_by_name('$fountain',$fountain);
+$fountain->{category} = "Other";
+$fountain->{filename} = "test_table";
+$fountain->{object_name} = '$fountain';
+&main::register_object_by_name('$Appliances',$Appliances);
+$Appliances->{category} = "Other";
+$Appliances->{filename} = "test_table";
+$Appliances->{object_name} = '$Appliances';
+&main::register_object_by_name('$backyard_light',$backyard_light);
+$backyard_light->{category} = "Other";
+$backyard_light->{filename} = "test_table";
+$backyard_light->{object_name} = '$backyard_light';
+&main::register_object_by_name('$v_garage_light',$v_garage_light);
+$v_garage_light->{category} = "Other";
+$v_garage_light->{filename} = "test_table";
+$v_garage_light->{object_name} = '$v_garage_light';
+&main::register_object_by_name('$v_fountain',$v_fountain);
+$v_fountain->{category} = "Other";
+$v_fountain->{filename} = "test_table";
+$v_fountain->{object_name} = '$v_fountain';
+&main::register_object_by_name('$motion',$motion);
+$motion->{category} = "Other";
+$motion->{filename} = "test_table";
+$motion->{object_name} = '$motion';
+&main::register_object_by_name('$Motion',$Motion);
+$Motion->{category} = "Other";
+$Motion->{filename} = "test_table";
+$Motion->{object_name} = '$Motion';
+&main::register_object_by_name('$motion_unit',$motion_unit);
+$motion_unit->{category} = "Other";
+$motion_unit->{filename} = "test_table";
+$motion_unit->{object_name} = '$motion_unit';
+&main::register_object_by_name('$v_what_speed',$v_what_speed);
+$v_what_speed->{category} = "MisterHouse";
+$v_what_speed->{filename} = "benchmarks";
+$v_what_speed->{object_name} = '$v_what_speed';
+&main::register_object_by_name('$timer_speed_check',$timer_speed_check);
+$timer_speed_check->{category} = "MisterHouse";
+$timer_speed_check->{filename} = "benchmarks";
+$timer_speed_check->{object_name} = '$timer_speed_check';
+&main::register_object_by_name('$v_speed_benchmark',$v_speed_benchmark);
+$v_speed_benchmark->{category} = "MisterHouse";
+$v_speed_benchmark->{filename} = "benchmarks";
+$v_speed_benchmark->{object_name} = '$v_speed_benchmark';
+&main::register_object_by_name('$eliza_rule',$eliza_rule);
+$eliza_rule->{category} = "Entertainment";
+$eliza_rule->{filename} = "eliza_server";
+$eliza_rule->{object_name} = '$eliza_rule';
+&main::register_object_by_name('$eliza_data',$eliza_data);
+$eliza_data->{category} = "Entertainment";
+$eliza_data->{filename} = "eliza_server";
+$eliza_data->{object_name} = '$eliza_data';
+&main::register_object_by_name('$eliza_voice',$eliza_voice);
+$eliza_voice->{category} = "Entertainment";
+$eliza_voice->{filename} = "eliza_server";
+$eliza_voice->{object_name} = '$eliza_voice';
+&main::register_object_by_name('$eliza_card',$eliza_card);
+$eliza_card->{category} = "Entertainment";
+$eliza_card->{filename} = "eliza_server";
+$eliza_card->{object_name} = '$eliza_card';
+&main::register_object_by_name('$eliza_wavcomp',$eliza_wavcomp);
+$eliza_wavcomp->{category} = "Entertainment";
+$eliza_wavcomp->{filename} = "eliza_server";
+$eliza_wavcomp->{object_name} = '$eliza_wavcomp';
+&main::register_object_by_name('$f_eliza_deep_thoughts',$f_eliza_deep_thoughts);
+$f_eliza_deep_thoughts->{category} = "Entertainment";
+$f_eliza_deep_thoughts->{filename} = "eliza_server";
+$f_eliza_deep_thoughts->{object_name} = '$f_eliza_deep_thoughts';
+&main::register_object_by_name('$v_reload_code',$v_reload_code);
+$v_reload_code->{category} = "MisterHouse";
+$v_reload_code->{filename} = "mh_control";
+$v_reload_code->{object_name} = '$v_reload_code';
+&main::register_object_by_name('$v_reload_code2',$v_reload_code2);
+$v_reload_code2->{category} = "MisterHouse";
+$v_reload_code2->{filename} = "mh_control";
+$v_reload_code2->{object_name} = '$v_reload_code2';
+&main::register_object_by_name('$v_listen',$v_listen);
+$v_listen->{category} = "MisterHouse";
+$v_listen->{filename} = "mh_control";
+$v_listen->{object_name} = '$v_listen';
+&main::register_object_by_name('$v_read_tables',$v_read_tables);
+$v_read_tables->{category} = "MisterHouse";
+$v_read_tables->{filename} = "mh_control";
+$v_read_tables->{object_name} = '$v_read_tables';
+&main::register_object_by_name('$v_set_password',$v_set_password);
+$v_set_password->{category} = "MisterHouse";
+$v_set_password->{filename} = "mh_control";
+$v_set_password->{object_name} = '$v_set_password';
+&main::register_object_by_name('$v_uptime',$v_uptime);
+$v_uptime->{category} = "MisterHouse";
+$v_uptime->{filename} = "mh_control";
+$v_uptime->{object_name} = '$v_uptime';
+&main::register_object_by_name('$v_http_control',$v_http_control);
+$v_http_control->{category} = "MisterHouse";
+$v_http_control->{filename} = "mh_control";
+$v_http_control->{object_name} = '$v_http_control';
+&main::register_object_by_name('$http_monitor',$http_monitor);
+$http_monitor->{category} = "MisterHouse";
+$http_monitor->{filename} = "mh_control";
+$http_monitor->{object_name} = '$http_monitor';
+&main::register_object_by_name('$v_restart_mh',$v_restart_mh);
+$v_restart_mh->{category} = "MisterHouse";
+$v_restart_mh->{filename} = "mh_control";
+$v_restart_mh->{object_name} = '$v_restart_mh';
+&main::register_object_by_name('$v_reboot',$v_reboot);
+$v_reboot->{category} = "MisterHouse";
+$v_reboot->{filename} = "mh_control";
+$v_reboot->{object_name} = '$v_reboot';
+&main::register_object_by_name('$v_reboot_abort',$v_reboot_abort);
+$v_reboot_abort->{category} = "MisterHouse";
+$v_reboot_abort->{filename} = "mh_control";
+$v_reboot_abort->{object_name} = '$v_reboot_abort';
+&main::register_object_by_name('$v_debug',$v_debug);
+$v_debug->{category} = "MisterHouse";
+$v_debug->{filename} = "mh_control";
+$v_debug->{object_name} = '$v_debug';
+&main::register_object_by_name('$v_debug_toggle',$v_debug_toggle);
+$v_debug_toggle->{category} = "MisterHouse";
+$v_debug_toggle->{filename} = "mh_control";
+$v_debug_toggle->{object_name} = '$v_debug_toggle';
+&main::register_object_by_name('$v_show_debug',$v_show_debug);
+$v_show_debug->{category} = "MisterHouse";
+$v_show_debug->{filename} = "mh_control";
+$v_show_debug->{object_name} = '$v_show_debug';
+&main::register_object_by_name('$v_mode',$v_mode);
+$v_mode->{category} = "MisterHouse";
+$v_mode->{filename} = "mh_control";
+$v_mode->{object_name} = '$v_mode';
+&main::register_object_by_name('$v_mode_toggle',$v_mode_toggle);
+$v_mode_toggle->{category} = "MisterHouse";
+$v_mode_toggle->{filename} = "mh_control";
+$v_mode_toggle->{object_name} = '$v_mode_toggle';
+&main::register_object_by_name('$search_code_string',$search_code_string);
+$search_code_string->{category} = "MisterHouse";
+$search_code_string->{filename} = "mh_control";
+$search_code_string->{object_name} = '$search_code_string';
+&main::register_object_by_name('$v_list_voice_cmds',$v_list_voice_cmds);
+$v_list_voice_cmds->{category} = "MisterHouse";
+$v_list_voice_cmds->{filename} = "mh_control";
+$v_list_voice_cmds->{object_name} = '$v_list_voice_cmds';
+&main::register_object_by_name('$v_voice_cmds_help',$v_voice_cmds_help);
+$v_voice_cmds_help->{category} = "MisterHouse";
+$v_voice_cmds_help->{filename} = "mh_control";
+$v_voice_cmds_help->{object_name} = '$v_voice_cmds_help';
+&main::register_object_by_name('$v_list_x10_items',$v_list_x10_items);
+$v_list_x10_items->{category} = "MisterHouse";
+$v_list_x10_items->{filename} = "mh_control";
+$v_list_x10_items->{object_name} = '$v_list_x10_items';
+&main::register_object_by_name('$v_list_serial_items',$v_list_serial_items);
+$v_list_serial_items->{category} = "MisterHouse";
+$v_list_serial_items->{filename} = "mh_control";
+$v_list_serial_items->{object_name} = '$v_list_serial_items';
+&main::register_object_by_name('$v_list_debug_options',$v_list_debug_options);
+$v_list_debug_options->{category} = "MisterHouse";
+$v_list_debug_options->{filename} = "mh_control";
+$v_list_debug_options->{object_name} = '$v_list_debug_options';
+&main::register_object_by_name('$Power_Supply',$Power_Supply);
+$Power_Supply->{category} = "MisterHouse";
+$Power_Supply->{filename} = "mh_control";
+$Power_Supply->{object_name} = '$Power_Supply';
+&main::register_object_by_name('$x10_backlog_timer',$x10_backlog_timer);
+$x10_backlog_timer->{category} = "MisterHouse";
+$x10_backlog_timer->{filename} = "mh_control";
+$x10_backlog_timer->{object_name} = '$x10_backlog_timer';
+&main::register_object_by_name('$v_repeat_last_spoken',$v_repeat_last_spoken);
+$v_repeat_last_spoken->{category} = "MisterHouse";
+$v_repeat_last_spoken->{filename} = "mh_control";
+$v_repeat_last_spoken->{object_name} = '$v_repeat_last_spoken';
+&main::register_object_by_name('$v_clear_cache',$v_clear_cache);
+$v_clear_cache->{category} = "MisterHouse";
+$v_clear_cache->{filename} = "mh_control";
+$v_clear_cache->{object_name} = '$v_clear_cache';
+&main::register_object_by_name('$run_command',$run_command);
+$run_command->{category} = "MisterHouse";
+$run_command->{filename} = "mh_control";
+$run_command->{object_name} = '$run_command';
+&main::register_object_by_name('$search_command_string',$search_command_string);
+$search_command_string->{category} = "MisterHouse";
+$search_command_string->{filename} = "mh_control";
+$search_command_string->{object_name} = '$search_command_string';
+&main::register_object_by_name('$v_undo_last_change',$v_undo_last_change);
+$v_undo_last_change->{category} = "MisterHouse";
+$v_undo_last_change->{filename} = "mh_control";
+$v_undo_last_change->{object_name} = '$v_undo_last_change';
+&main::register_object_by_name('$mode_mh',$mode_mh);
+$mode_mh->{category} = "MisterHouse";
+$mode_mh->{filename} = "mh_control";
+$mode_mh->{object_name} = '$mode_mh';
+&main::register_object_by_name('$mode_security',$mode_security);
+$mode_security->{category} = "MisterHouse";
+$mode_security->{filename} = "mh_control";
+$mode_security->{object_name} = '$mode_security';
+&main::register_object_by_name('$mode_occupied',$mode_occupied);
+$mode_occupied->{category} = "MisterHouse";
+$mode_occupied->{filename} = "mh_control";
+$mode_occupied->{object_name} = '$mode_occupied';
+&main::register_object_by_name('$mode_sleeping',$mode_sleeping);
+$mode_sleeping->{category} = "MisterHouse";
+$mode_sleeping->{filename} = "mh_control";
+$mode_sleeping->{object_name} = '$mode_sleeping';
+&main::register_object_by_name('$v_update_docs',$v_update_docs);
+$v_update_docs->{category} = "MisterHouse";
+$v_update_docs->{filename} = "mh_control";
+$v_update_docs->{object_name} = '$v_update_docs';
+&main::register_object_by_name('$p_update_docs',$p_update_docs);
+$p_update_docs->{category} = "MisterHouse";
+$p_update_docs->{filename} = "mh_control";
+$p_update_docs->{object_name} = '$p_update_docs';
+&main::register_object_by_name('$p_mhdl_page',$p_mhdl_page);
+$p_mhdl_page->{category} = "MisterHouse";
+$p_mhdl_page->{filename} = "mh_release";
+$p_mhdl_page->{object_name} = '$p_mhdl_page';
+&main::register_object_by_name('$p_mhdl_date_page',$p_mhdl_date_page);
+$p_mhdl_date_page->{category} = "MisterHouse";
+$p_mhdl_date_page->{filename} = "mh_release";
+$p_mhdl_date_page->{object_name} = '$p_mhdl_date_page';
+&main::register_object_by_name('$v_mhdl_page',$v_mhdl_page);
+$v_mhdl_page->{category} = "MisterHouse";
+$v_mhdl_page->{filename} = "mh_release";
+$v_mhdl_page->{object_name} = '$v_mhdl_page';
+&main::register_object_by_name('$v_version',$v_version);
+$v_version->{category} = "MisterHouse";
+$v_version->{filename} = "mh_release";
+$v_version->{object_name} = '$v_version';
+&main::register_object_by_name('$mh_volume',$mh_volume);
+$mh_volume->{category} = "MisterHouse";
+$mh_volume->{filename} = "mh_sound";
+$mh_volume->{object_name} = '$mh_volume';
+&main::register_object_by_name('$mh_speakers',$mh_speakers);
+$mh_speakers->{category} = "MisterHouse";
+$mh_speakers->{filename} = "mh_sound";
+$mh_speakers->{object_name} = '$mh_speakers';
+&main::register_object_by_name('$mh_speakers_timer',$mh_speakers_timer);
+$mh_speakers_timer->{category} = "MisterHouse";
+$mh_speakers_timer->{filename} = "mh_sound";
+$mh_speakers_timer->{object_name} = '$mh_speakers_timer';
+&main::register_object_by_name('$test_volume',$test_volume);
+$test_volume->{category} = "MisterHouse";
+$test_volume->{filename} = "mh_sound";
+$test_volume->{object_name} = '$test_volume';
+&main::register_object_by_name('$test_speak_mode',$test_speak_mode);
+$test_speak_mode->{category} = "MisterHouse";
+$test_speak_mode->{filename} = "mh_sound";
+$test_speak_mode->{object_name} = '$test_speak_mode';
+&main::register_object_by_name('$test_speech_flags',$test_speech_flags);
+$test_speech_flags->{category} = "MisterHouse";
+$test_speech_flags->{filename} = "mh_sound";
+$test_speech_flags->{object_name} = '$test_speech_flags';
+&main::register_object_by_name('$restart_tts',$restart_tts);
+$restart_tts->{category} = "MisterHouse";
+$restart_tts->{filename} = "mh_sound";
+$restart_tts->{object_name} = '$restart_tts';
+&main::register_object_by_name('$mhsend_server',$mhsend_server);
+$mhsend_server->{category} = "MisterHouse";
+$mhsend_server->{filename} = "mhsend_server";
+$mhsend_server->{object_name} = '$mhsend_server';
+&main::register_object_by_name('$organizer_holidays',$organizer_holidays);
+$organizer_holidays->{category} = "Time";
+$organizer_holidays->{filename} = "organizer";
+$organizer_holidays->{object_name} = '$organizer_holidays';
+&main::register_object_by_name('$organizer_vacation',$organizer_vacation);
+$organizer_vacation->{category} = "Time";
+$organizer_vacation->{filename} = "organizer";
+$organizer_vacation->{object_name} = '$organizer_vacation';
+&main::register_object_by_name('$organizer_events',$organizer_events);
+$organizer_events->{category} = "Time";
+$organizer_events->{filename} = "organizer";
+$organizer_events->{object_name} = '$organizer_events';
+&main::register_object_by_name('$organizer_check',$organizer_check);
+$organizer_check->{category} = "Time";
+$organizer_check->{filename} = "organizer";
+$organizer_check->{object_name} = '$organizer_check';
+&main::register_object_by_name('$p_ical2vsdb',$p_ical2vsdb);
+$p_ical2vsdb->{category} = "Time";
+$p_ical2vsdb->{filename} = "organizer";
+$p_ical2vsdb->{object_name} = '$p_ical2vsdb';
+&main::register_object_by_name('$v_get_ical_data',$v_get_ical_data);
+$v_get_ical_data->{category} = "Time";
+$v_get_ical_data->{filename} = "organizer";
+$v_get_ical_data->{object_name} = '$v_get_ical_data';
+&main::register_object_by_name('$_organizer_cal',$_organizer_cal);
+$_organizer_cal->{category} = "Time";
+$_organizer_cal->{filename} = "organizer";
+$_organizer_cal->{object_name} = '$_organizer_cal';
+&main::register_object_by_name('$_organizer_todo',$_organizer_todo);
+$_organizer_todo->{category} = "Time";
+$_organizer_todo->{filename} = "organizer";
+$_organizer_todo->{object_name} = '$_organizer_todo';
+&main::register_object_by_name('$my_test1',$my_test1);
+$my_test1->{category} = "Test";
+$my_test1->{filename} = "my_test";
+$my_test1->{object_name} = '$my_test1';
+&main::register_object_by_name('$v_test_light2',$v_test_light2);
+$v_test_light2->{category} = "Test";
+$v_test_light2->{filename} = "test_x10";
+$v_test_light2->{object_name} = '$v_test_light2';
+&main::register_object_by_name('$v_test_lights',$v_test_lights);
+$v_test_lights->{category} = "Test";
+$v_test_lights->{filename} = "test_x10";
+$v_test_lights->{object_name} = '$v_test_lights';
+&main::register_object_by_name('$test_button',$test_button);
+$test_button->{category} = "Test";
+$test_button->{filename} = "test_x10";
+$test_button->{object_name} = '$test_button';
+
+#-------------------------------------------------
+
+sub tk_frames_loopcode {
+ print '   tk_frames' if $Debug{user_code};
+   if ($Run_Members{'tk_frames'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in tk_frames.  Code was disabled', 0);        $Run_Members{'tk_frames'} = 0; return;
+ }   elsif ($Run_Members{'tk_frames'} > 2 and $Run_Members{'tk_frames'} != $Run_Members_Error_Count{'tk_frames'} )  {
+        display($Run_Members{'tk_frames'}.' eval errors in tk_frames out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'tk_frames'} = $Run_Members{'tk_frames'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = MisterHouse
+
+$Category = 'MisterHouse';
+
+# $Date$
+# $Revision$
+
+#@ Specifies tk layout
+
+# Position=1                    Load before any tk_widget code
+
+# This file determines the layout of the mh Tk window
+
+# Re-create tk widgets on startup or if this file has changed on code reload
+if ( $MW and $Reload ) {
+
+    # *** Need to loop through child windows and configure too (if !$Startup)
+
+    # If this file has not changed, only re-create the tk widget grids
+    if (    !$Startup
+        and !file_change("$config_parms{code_dir_common}/tk_frames.pl")
+        and !$Invalidate_Window )
+    {
+        print "Deleting old grid framework\n";
+        $Tk_objects{grid}->destroy;
+        $Tk_objects{fb2}->destroy;
+        $Tk_objects{fb3}->destroy;
+        $Tk_objects{fb4}->destroy;
+
+        $Tk_objects{grid} =
+          $Tk_objects{ft}->Frame->pack(qw/-side right -anchor n/);
+        $Tk_objects{fb2} =
+          $MW->Frame->pack(qw/-side bottom -fill both -expand 1/);
+        $Tk_objects{fb3} =
+          $MW->Frame->pack(qw/-side bottom -fill both -expand 1/);
+        $Tk_objects{fb4} =
+          $MW->Frame->pack(qw/-side bottom -fill both -expand 1/);
+
+        # *** Put in to make window menu fonts sync with scheme change (doesn't seem to work)
+
+        &configure_element( 'window', \$MW );
+
+        &configure_element( 'frame', \$Tk_objects{grid} );
+        &configure_element( 'frame', \$Tk_objects{fb2} );
+        &configure_element( 'frame', \$Tk_objects{fb3} );
+        &configure_element( 'frame', \$Tk_objects{fb4} );
+
+    }
+
+    # This file changed, so re-create all frames
+    else {
+        file_change("$config_parms{code_dir_common}/tk_frames.pl")
+          if $Startup
+          ; # Set file change time stamp *** Why? display_alpha doesn't do this for bitmaps
+
+        $Invalidate_Window = 0;
+
+        unless ($Startup) {
+            print "Deleting Frames\n";
+            $Tk_objects{ft}->destroy;
+            $Tk_objects{fb}->destroy;
+            $Tk_objects{fb2}->destroy;
+            $Tk_objects{fb3}->destroy;
+            $Tk_objects{fb4}->destroy;
+        }
+        print "Creating Frames\n";
+
+        # Create top and bottom frames
+        $Tk_objects{ft} = $MW->Frame->pack(qw/-side top -fill both -expand 1/);
+        $Tk_objects{fb} = $MW->Frame->pack(qw/-side top -fill both -expand 1/);
+        $Tk_objects{fb2} =
+          $MW->Frame->pack(qw/-side bottom -fill both -expand 1/);
+        $Tk_objects{fb3} =
+          $MW->Frame->pack(qw/-side bottom -fill both -expand 1/);
+        $Tk_objects{fb4} =
+          $MW->Frame->pack(qw/-side bottom -fill both -expand 1/);
+
+        &configure_element( 'frame', \$Tk_objects{ft} );
+        &configure_element( 'frame', \$Tk_objects{fb} );
+        &configure_element( 'frame', \$Tk_objects{fb2} );
+        &configure_element( 'frame', \$Tk_objects{fb4} );
+
+        # Create top left and tk grid frames
+        $Tk_objects{ftl} =
+          $Tk_objects{ft}->Frame->pack(qw/-side left -fill both -expand 1/);
+        $Tk_objects{grid} =
+          $Tk_objects{ft}->Frame->pack(qw/-side right -padx 5 -anchor n/);
+
+        &configure_element( 'frame', \$Tk_objects{ftl} );
+        &configure_element( 'frame', \$Tk_objects{grid} );
+
+        # *** Why is this here???  Should be in widgets (where it is duplicated currently!)
+
+        if ( $config_parms{tk_system_widgets} ) {
+
+            &tk_label_new( 2, \$Tk_objects{label_time} )
+              if defined $config_parms{tk_clock} and $config_parms{tk_clock};
+            &tk_label_new( 2, \$Tk_objects{label_uptime_cpu} );
+            &tk_label_new( 2, \$Tk_objects{label_uptime_mh} );
+            &tk_label_new( 2, \$Tk_objects{label_cpu_used} );
+            &tk_label_new( 2, \$Tk_objects{label_memory_used} )
+              unless $Info{OS_name} =~ /Win/;    # Works for NT/2k
+
+        }
+
+        # Add command list to top left frame
+        $Tk_objects{cmd_list} = &tk_command_list( $Tk_objects{ftl} );
+        $Tk_objects{cmd_list}->pack(qw/-side top -expand 1 -fill both/);
+
+        # *** Config parms for heights of these!
+
+        # Add speak and log windows to bottom frame
+        $Tk_objects{speak_window} = $Tk_objects{fb}->Scrolled(
+            'Text',
+            -height     => 3,
+            -width      => 100,
+            -wrap       => 'none',
+            -scrollbars => 'se',
+            -setgrid    => 'true'
+        )->pack(qw/-side top -expand 1 -fill both/);
+        $Tk_objects{speak_window}->insert( '0.0', ( join "\n", @Speak_Log ) )
+          ;    # Seed with previous entries
+
+        &configure_element( 'log', \$Tk_objects{speak_window} );
+
+        $Tk_objects{log_window} = $Tk_objects{fb}->Scrolled(
+            'Text',
+            -height     => 3,
+            -width      => 100,
+            -wrap       => 'none',
+            -scrollbars => 'osoe',
+            -setgrid    => 'true'
+        )->pack(qw/-side top -expand 1 -fill both/);
+        $Tk_objects{log_window}->insert( '0.0', ( join "\n", @Print_Log ) )
+          ;    # Seed with previous entries
+
+        &configure_element( 'log', \$Tk_objects{log_window} );
+
+    }
+
+    # Show the window (it is hidden during statup)
+    if ($Startup) {
+        $MW->deiconify;
+        $MW->raise;
+        $MW->focusForce;
+
+        #       $MW->focus("-force");
+        #       $MW->grabGlobal;
+        #       $MW->grab("-global");
+    }
+
+}
+   $Benchmark_Members{'tk_frames'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of tk_frames#-------------------------------------------------
+
+sub tk_widgets_loopcode {
+ print '   tk_widgets' if $Debug{user_code};
+   if ($Run_Members{'tk_widgets'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in tk_widgets.  Code was disabled', 0);        $Run_Members{'tk_widgets'} = 0; return;
+ }   elsif ($Run_Members{'tk_widgets'} > 2 and $Run_Members{'tk_widgets'} != $Run_Members_Error_Count{'tk_widgets'} )  {
+        display($Run_Members{'tk_widgets'}.' eval errors in tk_widgets out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'tk_widgets'} = $Run_Members{'tk_widgets'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = MisterHouse
+
+$Category = 'MisterHouse';
+
+# $Date$
+# $Revision$
+
+#@ Adds mh widgets to the tk and web interfaces.  You must enable the
+#@ mh_control.pl script if you enable this one.
+
+# Position=2                    Load after tk_frames
+
+# This file adds to the tk widget grid frame
+
+# Re-create tk widgets on reload
+if ($Reload) {
+
+    # Note: We DO want to call Tk widgets, even without $MW, to allow
+    #       web widgets with -tk 0
+    #  *** Strangest thing, F3 doesn't take.  Passes through to mh_control keyboard handler.  Others don't. (?)
+    # *** Menu accelerators don't work in Windows as defined (Alt+R, etc.)
+    if ($MW) {
+        $MW->bind( '<F1>' => \&read_code );
+        $MW->bind( '<F2>' => \&toggle_pause );
+        $MW->bind( '<F3>' => \&sig_handler );
+
+        #       $MW->bind('<F4>' => \&toggle_debug);
+        $MW->bind( '<F5>' => \&toggle_log );
+    }
+
+    #    &tk_mbutton('Help', \&help);  #On toolbar now
+
+    #$Tk_objects{grid_caption} = $Tk_objects{grid}->Label(-justify => 'center', -anchor => 'w',  -font => $config_parms{tk_font_fixed});
+
+    #$Tk_objects{grid_caption}->grid($Tk_objects{grid_caption}, -sticky => 'n');
+
+    #$Tk_objects{grid_caption}->configure(-text => 'Widgets');
+
+    #    &tk_button('Reload (F1)', \&read_code, 'Pause (F2)', \&toggle_pause, ' Exit (F3) ', \&sig_handler, 'Log (F5)', \&toggle_log);
+
+    use vars '$mh_volume';    # In case we don't have mh_sound (see below)
+
+    if ( $Reload and $MW ) {
+
+        # Most users won't care about this out of the box, so default is off
+        if ( $config_parms{tk_system_widgets} ) {
+            &tk_label_new( 2, \$Tk_objects{label_time} )
+              if $config_parms{tk_clock};
+            &tk_label_new( 2, \$Tk_objects{label_uptime_cpu} );
+            &tk_label_new( 2, \$Tk_objects{label_uptime_mh} );
+            &tk_label_new( 2, \$Tk_objects{label_cpu_used} );
+            &tk_label_new( 2, \$Tk_objects{label_memory_used} )
+              unless $Info{OS_name} =~ /Win/;    # Works for NT/2k
+            $Tk_objects{sliders}{sleep} =
+              &tk_scalebar( \$Loop_Sleep_Time, 0, 'Sleep', 0, 200 );
+            $Tk_objects{sliders}{passes} =
+              &tk_scalebar( \$Loop_Tk_Passes, 1, 'Passes', 0, 200 );
+        }
+
+        $Tk_objects{sliders}{x10_errata} =
+          &tk_scalebar( \$config_parms{x10_errata}, 1, 'X10 Logging', 1, 4, 0 );
+
+    }
+
+    #    &tk_entry("Sleep Time", \$Loop_Sleep_Time);
+    #    &tk_entry("Passes", \$Loop_Tk_Passes);
+    #   &tk_entry("Sleep time", \$Loop_Sleep_Time, "Sleep count", \$config_parms{sleep_count});  ... only works on reload
+
+    # $search_code_string is defined in /code/common/mh_control.pl
+
+    &tk_entry( 'MP3 Search', \$Save{mp3_search}, 'MP3 Genre',
+        \$Save{mp3_Genre} )
+      if $Run_Members{mp3_playlist};
+
+    #   &tk_entry('Phone Search', \$Save{phone_search}) if $Run_Members{phone};
+
+    #&tk_entry('TV search', \$Save{tv_search}, 'TV dates', \$Save{tv_days}) if $Run_Members{tv_info};
+    #   &tk_entry('TV key', \$Save{ir_key}, 'VCR key', \$Save{vcr_key}) if $Run_Members{tv};
+
+    #   &tk_checkbutton('Sleeping Parents', \$Save{sleeping_parents}, 'Sleeping Kids', \$Save{sleeping_kids});
+
+    #   &tk_radiobutton('Mode',  \$Save{mode}, ['normal', 'mute', 'offline'], ['Normal', 'Mute', 'Offline']);
+
+    #   &tk_entry('Code Search', $search_code_string,    'Debug flag', \$config_parms{debug});
+    &tk_entry( 'Code Search', $search_code_string )
+      if $config_parms{tk_system_widgets};
+
+    # There is a menu for this, so most won't want this (File | Debug)
+    &tk_entry( 'Debug flag', \$config_parms{debug} )
+      if defined $config_parms{debug_widget} and $config_parms{debug_widget};
+
+    #   &tk_radiobutton('VR Mode',  \$tk_vr_mode, ['awake', 'asleep', 'off'], ['Awake', 'Asleep', 'Off']) if $Run_Members{viavoice_control};
+
+    #   &tk_entry      ('Heat Temp', \$Save{heat_temp})                       if $Run_Members{weather_monitor};
+    #   &tk_radiobutton('Heat Temp', \$Save{heat_temp}, [60, 64, 66, 68, 70]) if $Run_Members{weather_monitor};
+
+    #   &tk_radiobutton('Ping Test', \$Save{ping_test_flag}, [1,0], ['On', 'Off']) if $Run_Members{internet_connect_check};
+
+    #   &tk_radiobutton('Check email', \$Save{email_check}, ['no', 'yes']) if $Run_Members{internet_mail};
+
+    #   &tk_radiobutton('Internet Speak', \$config_parms{internet_speak_flag}, ['none', 'local', 'all']) if $Run_Members{monitor_server};
+
+    #   &tk_radiobutton('Wakeup Time',  \$Save{wakeup_time}, ['6 am', '6:20 am', '6:40 am', '7 am', ' ']) if $Run_Members{wakeup};
+    #   &tk_entry('Wakeup Time', \$Save{wakeup_time}) if $Run_Members{wakeup};
+
+}
+
+   $Benchmark_Members{'tk_widgets'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of tk_widgets#-------------------------------------------------
+
+sub benchmarks_loopcode {
+ print '   benchmarks' if $Debug{user_code};
+   if ($Run_Members{'benchmarks'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in benchmarks.  Code was disabled', 0);        $Run_Members{'benchmarks'} = 0; return;
+ }   elsif ($Run_Members{'benchmarks'} > 2 and $Run_Members{'benchmarks'} != $Run_Members_Error_Count{'benchmarks'} )  {
+        display($Run_Members{'benchmarks'}.' eval errors in benchmarks out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'benchmarks'} = $Run_Members{'benchmarks'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = MisterHouse
+
+$Category = 'MisterHouse';
+
+#@ Various benchmarking functions.
+
+# you can set parameters with at startup.  For example:
+#    mh -voice_cmd 0 -voice_text 0 -weeder_port none
+
+
+if ( said $v_what_speed) {
+    my $msg;
+    if ( $v_what_speed->{state} eq 'max' ) {
+        $Loop_Sleep_Time = 0;
+        $Loop_Tk_Passes  = .1;    # 0 gets reset to 1, so use .1
+        set $timer_speed_check 3;
+        print "Speeds1 = @Loop_Speeds\n";
+        print "Note: tk window is temporily disabled\n" if $MW;
+
+        $msg = 'Calculating maximum speed. One moment...';
+    }
+    else {
+        set $timer_speed_check .01;
+        $msg = 'Calculating normal speed...';
+    }
+    $v_what_speed->respond("app=pc $msg");
+
+}
+if ( expired $timer_speed_check) {
+    $Loop_Sleep_Time = $config_parms{sleep_time};
+    $Loop_Tk_Passes  = $config_parms{tk_passes};
+    print "Speeds2 = @Loop_Speeds\n";
+    $v_what_speed->respond(
+            "app=pc $Info{cpu_used}% of cpu, $Info{loop_speed} loops/sec, and "
+          . ( int $Info{memory_real} )
+          . " megabytes" );
+}
+
+
+if ( said $v_speed_benchmark) {
+    my $msg;
+    if ( $v_speed_benchmark->{state} eq 'Stop the' ) {
+        $Benchmark_Members{on_off_flag} = $speed_benchmark_count = 0;
+        undef %Benchmark_Members;
+        $msg = 'Speed benchmark stopped.';
+    }
+    else {
+        $Benchmark_Members{on_off_flag} = $speed_benchmark_count = 1
+          unless $speed_benchmark_count;
+        $msg =
+            'Speed benchmark started by '
+          . ( ( $v_speed_benchmark->{state} =~ /name/i ) ? 'name' : 'speed' )
+          . '.';
+    }
+    $v_speed_benchmark->respond("app=pc $msg");
+
+}
+$speed_benchmark_count++ if $speed_benchmark_count;
+
+if ( $speed_benchmark_count and ( new_second 5 or said $v_speed_benchmark) ) {
+    my $log =
+      "Benchmark report.  Loop count=$speed_benchmark_count.  The following is in milliseconds\n";
+    my $by_speed = ( state $v_speed_benchmark =~ /speed/ ) ? 1 : 0;
+    my @log;
+    for my $member (
+        sort {
+            $by_speed and ( $Benchmark_Members{$b} <=> $Benchmark_Members{$a} )
+              or $a cmp $b
+        } ' OTHER',
+        ' USER',
+        keys %Run_Members
+      )
+    {    # Use Run_Members so we get all members on the 1st pass
+        push @log, sprintf "  %-22s avg=%5.2f total=%5d", $member,
+          $Benchmark_Members{$member} / $speed_benchmark_count,
+          $Benchmark_Members{$member};
+    }
+
+    # Double or triple up columns so it fits on without scrolling when there are lots of members
+    if ( $#log > 100 ) {
+        my $i = 1 + int $#log / 3;
+        for my $j ( 0 .. $i ) {
+            $log .=
+                $log[$j] . " | "
+              . $log[ $j + $i ] . " | "
+              . $log[ $j + 2 * $i ] . "\n";
+        }
+    }
+    elsif ( $#log > 20 ) {
+        my $i = 1 + int $#log / 2;
+
+        #        print "db2 i=$i l=$#log\n";
+        for my $j ( 0 .. $i ) {
+            $log .= $log[$j] . " | " . $log[ $j + $i ] . "\n";
+        }
+    }
+    else {
+        for my $j ( 0 .. $#log ) {
+            $log .= $log[$j] . "\n";
+        }
+    }
+
+    file_write "$config_parms{data_dir}/logs/benchmark.log", $log;
+    display
+      text        => $log,
+      time        => 0,
+      font        => 'fixed',
+      window_name => 'benchmarks';
+}
+   $Benchmark_Members{'benchmarks'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of benchmarks#-------------------------------------------------
+
+sub eliza_server_loopcode {
+ print '   eliza_server' if $Debug{user_code};
+   if ($Run_Members{'eliza_server'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in eliza_server.  Code was disabled', 0);        $Run_Members{'eliza_server'} = 0; return;
+ }   elsif ($Run_Members{'eliza_server'} > 2 and $Run_Members{'eliza_server'} != $Run_Members_Error_Count{'eliza_server'} )  {
+        display($Run_Members{'eliza_server'}.' eval errors in eliza_server out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'eliza_server'} = $Run_Members{'eliza_server'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+
+# Category = Entertainment
+
+$Category = 'Entertainment';
+
+=begin comment
+
+#@ This code uses The Eliza Chatbot module to reply to a message.
+#@ Eliza is not a very sophisticated chatbot, but it allows for
+#@ a simple conversation.  The rules are in mh/data/eliza/*.txt.
+
+#@ Text can be entered via the Tk interface or via a web page.
+#@ An example page is in <a href="/speak">mh/web/speak/speak.shtml</a>.
+
+=cut
+
+
+
+#&tk_entry('Eliza Message', $eliza_data, 'Eliza Rule', $eliza_rule);
+&tk_entry( 'Eliza Message', $eliza_data );
+&tk_entry( 'Eliza Rule',    $eliza_rule );
+
+use Eliza;
+undef $eliza if $eliza and state_changed $eliza_rule;
+
+
+if ( defined( $state = state_now $eliza_data) ) {
+    my $msg = $state;
+
+    # Used cached data from a previous background DSN search, if from the web
+    #   my ($name, $name_short) = net_domain_name_start 'eliza_server', 'http' if get_set_by $eliza_data =~ /^web/;
+    my $name = $Http{Client_address};
+
+    #   $name = 'unknown' unless $name;
+
+    my $rule    = state $eliza_rule;
+    my $voice   = state $eliza_voice;
+    my $card    = state $eliza_card;
+    my $wavcomp = state $eliza_wavcomp;
+    if ( $rule eq 'none' or !$rule ) {
+
+        #	$msg = "$name_short says: $msg";
+        #       $msg = &Voice_Text::set_voice($voice, "$name_short says: $msg");
+    }
+    elsif ( $rule =~ 'thought' ) {
+        my $response = read_current $f_eliza_deep_thoughts;
+        $response = read_next $f_eliza_deep_thoughts if $rule eq 'thought2';
+
+        #       $response = "$name_short says: $msg.  $name says: $response" if $msg;
+        $response = "You said $msg.  $voice says: $response" if $msg;
+        $msg = $response;
+
+        #        $msg = &Voice_Text::set_voice($voice, $response);
+    }
+    else {
+        $eliza = new Chatbot::Eliza "Eliza", "../data/eliza/$rule.txt"
+          unless $eliza;
+        my $response = $eliza->transform($msg);
+        $msg = "You said: $msg.  $voice says: $response";
+
+        #        $msg  = "$name_short said: $msg.  $name says: $response";
+        #        $msg  = "$name_short said: " . &Voice_Text::set_voice($voice, $msg);
+        #        $msg .= "  Eliza says: "     . &Voice_Text::set_voice($voice, $response);
+    }
+    print "Speaking eliza data with voice=$voice, compression=$wavcomp\n";
+
+    #   speak card => 3, compression => $wavcomp, text => $msg;
+    speak
+      app         => 'chatbot',
+      card        => $card,
+      voice       => $voice,
+      compression => $wavcomp,
+      text        => $msg,
+      requestor   => $name;
+
+    #    speak app => 'chatbot',  compression => $wavcomp, text => $msg;
+    logit( "$config_parms{data_dir}/logs/eliza_server.$Year.log",
+        "domain=$name text=$msg" );
+}
+
+if ( my ( $name, $name_short ) = net_domain_name_done 'eliza_server' ) {
+    print_log "Eliza visitor from $name_short ($name)";
+}
+   $Benchmark_Members{'eliza_server'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of eliza_server#-------------------------------------------------
+
+sub menu_loopcode {
+ print '   menu' if $Debug{user_code};
+   if ($Run_Members{'menu'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in menu.  Code was disabled', 0);        $Run_Members{'menu'} = 0; return;
+ }   elsif ($Run_Members{'menu'} > 2 and $Run_Members{'menu'} != $Run_Members_Error_Count{'menu'} )  {
+        display($Run_Members{'menu'}.' eval errors in menu out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'menu'} = $Run_Members{'menu'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+
+# Category = MisterHouse
+
+$Category = 'MisterHouse';
+
+#@ This code loads all the .menu files in your code dirs, for use with various menu interfaces like
+#@ <a href="/bin/menu.pl">/bin/menu.pl</a>.
+
+=begin comment
+
+ This code will read all .menu files in your code_dirs.
+ Then you can walk thru the menus with any of these:
+
+  Web browser:        http://localhost/sub?menu_html
+  WAP phone:          http://localhost/sub?menu_wml
+  Tellme.com phone:   http://localhost/sub?menu_vxml
+  LCD keypads:        see mh/code/bruce/lcd.pl for an example
+  Audible feedback:   see mh/code/public/audible_menu.* for an example
+  Numberic keyboard:  see mh/code/common/keyboard_numbered_menu.pl
+
+ See the 'Customizing the Menu interfaces' section mh/docs/mh.*  for more info.
+
+ See code/bruce/menu_bruce.pl for additional user specific menu code.
+
+=cut
+
+# Use these to enable non-local access
+# NOTE:  We don't have authorization menus yet,
+#        for tellme.com menus, so you may
+#        may want to turn these off, or only create
+#        harmless menus.
+#$Password_Allow{'&menu_html'}          = 'anyone';
+#$Password_Allow{'&menu_wml'}           = 'anyone';
+#$Password_Allow{'&menu_vxml'}          = 'anyone';
+#$Password_Allow{'&menu_run'}           = 'anyone';
+#$Password_Allow{'&menu_run_response'}  = 'anyone';
+
+if ($Reread) {
+    print_log 'Rereading .menu code files.';
+
+    # Create a menu with all mh voice commands
+    #   my $menu_mh = menu_create "$config_parms{code_dir}/mh.menu";
+    my $menu_mh = menu_create "$Code_Dirs[0]/mh.menu";
+
+    # Find all .menu files
+    my %file_paths = &file_read_dir(@Code_Dirs);
+    for my $member ( keys %file_paths ) {
+        next unless $member =~ /(\S+).menu$/i;
+        next if $config_parms{no_load} and $member =~ /$config_parms{no_load}/i;
+        menu_parse scalar file_read( $file_paths{$member} ), $1;
+    }
+
+    # Set default menus, based on ip addresses
+    set_menu_default( 'main', 'Top', 'default' )
+      ;    # Default to top of main for unknown ip address
+
+    #   set_menu_default('main', 'Top|Main|Rooms|Living Room',   '127.0.0.1');
+    #   set_menu_default('main', 'Main|Rooms|Living Room', '192.168.0.81');
+    #   set_menu_default('main', 'Main|Rooms|Bedroom',     '192.168.0.83');
+}
+
+# Monitor wap and vxml sessions
+if ( $Http{loop} == $Loop_Count ) {
+    if ( $Http{request} =~ /menu_wml/ ) {
+        play 'wap';    # Defined in event_sounds.pl
+        my $msg =
+          "WAP call from $Http{'User-Agent'}, $Http{'x-up-subno'} $Http{request}";
+
+        #       display $msg, 0;        # See if this can be used for security
+        logit "$config_parms{data_dir}/logs/menu_wml.$Year_Month_Now.log", $msg;
+    }
+    if ( $Http{request} =~ /menu_vxml/ ) {
+        play 'tell_me';    # Defined in event_sounds.pl
+        my $msg = "Tellme call: $Http{request}";
+        print_log $msg;
+        logit "$config_parms{data_dir}/logs/menu_vxml.$Year_Month_Now.log",
+          $msg;
+    }
+}
+   $Benchmark_Members{'menu'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of menu#-------------------------------------------------
+
+sub mh_control_loopcode {
+ print '   mh_control' if $Debug{user_code};
+   if ($Run_Members{'mh_control'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in mh_control.  Code was disabled', 0);        $Run_Members{'mh_control'} = 0; return;
+ }   elsif ($Run_Members{'mh_control'} > 2 and $Run_Members{'mh_control'} != $Run_Members_Error_Count{'mh_control'} )  {
+        display($Run_Members{'mh_control'}.' eval errors in mh_control out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'mh_control'} = $Run_Members{'mh_control'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = MisterHouse
+
+$Category = 'MisterHouse';
+
+# $Date$
+# $Revision$
+
+#@ Core MisterHouse commands e.g. reload code, list x10 items, rotate logs,
+#@ update docs.  This script also defines and lets you set the various modes.
+
+# Reload MisterHouse
+
+# Force reload MisterHouse
+
+
+# Start/stop voice recognition
+
+sub handle_listen_state() {
+    my $state = state $v_listen;
+    if ( $state eq 'Start' ) {
+        if ( $v_listen->{set_by} =~ '^vr' ) {
+            &Voice_Cmd::wait_for_command(0);
+        }
+        $v_listen->respond('app=control I am listening.');
+    }
+    else {
+        &Voice_Cmd::wait_for_command('Start listening');
+        $v_listen->respond('app=control I am not listening.');
+    }
+}
+
+# Read and process mht files
+
+# Set one of the passwords
+
+sub handle_set_password_state() {
+    my $state = state $v_set_password;
+    @ARGV = ( -user => $state );
+    print_log "Setting $state password with: @ARGV";
+    do "set_password";
+    &password_read;    # Re-read new password data
+}
+
+# Display program and system uptime
+
+sub handle_uptime_state() {
+    my $uptime_pgm      = &time_diff( $Time_Startup_time, time );
+    my $uptime_computer = &time_diff( $Time_Boot_time,    $Time );
+    respond("I was started $uptime_pgm ago. "
+          . "The computer was booted $uptime_computer ago." );
+}
+
+# Control and monitor the http server
+
+sub handle_http_control_state() {
+    my $state = state $v_http_control;
+
+    #   print_log "${state}ing the http server";
+    socket_open 'http'    if $state eq 'Open';
+    socket_close 'http'   if $state eq 'Close';
+    socket_restart 'http' if $state eq 'Restart';
+
+    # Check the http port, so we can restart it if down.
+    if ( $state eq 'Check' ) {
+        unless ( start $http_monitor) {
+            my $msg = "The http server $config_parms{http_server}:"
+              . "$config_parms{http_port} is down.  Restarting";
+            print_log $msg;
+            display
+              text        => "$Time_Date: $msg\n",
+              time        => 0,
+              window_name => 'http down log',
+              append      => 'bottom';
+            socket_close 'http';    # Somehow this gets it going again?
+            stop $http_monitor if active $http_monitor;    # Need this?
+        }
+        else {
+            print_log "The http server is up"
+              unless get_set_by $v_http_control eq 'time';
+            stop $http_monitor;
+        }
+    }
+}
+run_voice_cmd 'Check the http server', undef, 'time', 1 if new_minute 1;
+
+# Restart MisterHouse
+
+sub restart_mh {
+    my ($command) = @_;
+    my $restart = ( $command eq "Restart" ) ? 1 : 0;
+    my $exit_timer = new Timer;
+    print_log "MisterHouse will " . lc($command) . " in 2 seconds.";
+    $exit_timer->set( 2, "&exit_pgm($restart)" );
+}
+
+# This will be abend.
+# Allow for no msg on first time use where this flag is not set yet.
+if (    $Startup
+    and $Save{mh_exit}
+    and $Save{mh_exit} ne 'normal'
+    and $Save{mh_exit} ne 'restart' )
+{
+    # May not be "auto" at all.
+    # Often it is just ran manually after the last abend.
+    my $exit_condition = $Save{mh_exit};
+    $exit_condition = 'unexpectedly!' if $exit_condition eq 'abend';
+    display "MisterHouse restarted $exit_condition", 0;
+}
+
+# Reboot/shutdown the computer (windows only)
+
+sub handle_reboot_state() {
+    my $state = state $v_reboot;
+    return unless $OS_win;
+    respond "$state the computer";
+    if ( $Info{OS_name} eq 'Win95' ) {
+        run 'RUNDLL USER.EXE,ExitWindows';
+    }
+
+    # In theory, either of these work for Win98/WinMe
+    elsif ( $Info{OS_name} eq 'WinMe' ) {
+        respond "The house computer will reboot in 15 seconds";
+        run 'start c:\\windows\\system\\runonce.exe -q';
+        sleep 5;    # Give it a chance to get started
+        &exit_pgm;
+    }
+    elsif ( $Info{OS_name} eq 'NT' ) {
+        my $machine = $ENV{COMPUTERNAME};
+        respond "The computer $machine will reboot in 1 minute.";
+        my $reboot = ( $state eq 'Reboot' ) ? 1 : 0;
+        Win32::InitiateSystemShutdown( $machine, 'Rebooting in 1 minute',
+            60, 1, $reboot );
+    }
+    elsif ( $Info{OS_name} eq 'XP' ) {
+        my $machine = $ENV{COMPUTERNAME};
+        respond "The computer $machine will reboot in 1 minute.";
+        my $reboot = ( $state =~ /^reboot$/i ) ? '-r' : '-s';
+
+        # *** Need 60 second timer to exit program!
+        run "SHUTDOWN $reboot -f -t 60";
+    }
+    else {
+        run 'rundll32.exe shell32.dll,SHExitWindowsEx 6 ';
+        sleep 5;    # Give it a chance to get started
+        &exit_pgm;
+    }
+}
+
+# Good info for all OSes here: http://www.robvanderwoude.com/index.html
+#http://support.microsoft.com/support/kb/articles/q234/2/16.asp
+#  rundll32.exe shell32.dll,SHExitWindowsEx n
+#where n is one, or a combination of, the following numbers:
+#0 - LOGOFF
+#1 - SHUTDOWN
+#2 - REBOOT
+#4 - FORCE
+#8 - POWEROFF
+#The above options can be combined into one value to achieve different results.
+#For example, to restart Windows forcefully, without querying any running
+#programs, use the following command line:
+#rundll32.exe shell32.dll,SHExitWindowsEx 6
+
+# Abort a reboot that has been initiated
+
+sub handle_reboot_abort_state() {
+    return unless $OS_win;
+    if ( $Info{OS_name} eq 'XP' ) {
+        run "SHUTDOWN -a";
+        respond "app=pc The reboot has been aborted.";
+    }
+    else {
+        my $machine = $ENV{COMPUTERNAME};
+        Win32::AbortSystemShutdown($machine);
+        respond "app=pc The reboot has been aborted.";
+    }
+}
+
+# Turn on selected debug options, or turn off completely
+
+sub handle_debug_state() {
+    my $state = state $v_debug;
+    if ( $state eq 'none' ) {
+        $config_parms{debug} = '';
+        %Debug = {};
+        $v_debug->respond("Debugging completely turned off");
+    }
+    else {
+        $Debug{$state} = 1;
+        &update_config_parms_debug;
+        $state =~ s/_/\x20/g;
+        $v_debug->respond("Debugging turned on for $state");
+    }
+}
+
+# Toggle selected debug options
+
+sub handle_debug_toggle_state() {
+    my $state = state $v_debug_toggle;
+    if ( $Debug{$state} ) {
+        $Debug{$state} = 0;
+        &update_config_parms_debug;
+        $state =~ s/_/\x20/g;
+        $v_debug_toggle->respond("Debugging turned off for $state");
+    }
+    else {
+        $Debug{$state} = 1;
+        &update_config_parms_debug;
+        $state =~ s/_/\x20/g;
+        $v_debug_toggle->respond("Debugging turned on for $state");
+    }
+}
+
+# Display currently active debug flags
+
+sub handle_show_debug_state() {
+    &update_config_parms_debug;
+    if ( $config_parms{debug} eq '' ) {
+        $v_show_debug->respond('There are no active debug flags');
+    }
+    else {
+        $v_show_debug->respond(
+            'The currently active debug flags are ' . $config_parms{debug} );
+    }
+}
+
+sub update_config_parms_debug {
+    my @currentDebugs = ();
+    foreach my $key ( keys %Debug ) {
+        next if $key eq 'debug_previous';
+        push( @currentDebugs, $key . ':' . $Debug{$key} ) if $Debug{$key};
+    }
+    $config_parms{debug} = join( ';', @currentDebugs );
+}
+
+# Set the house mode
+
+sub handle_mode_state() {
+    my $state = state $v_mode;
+    $Save{mode} = $state;
+    set $mode_mh $state, $v_mode;
+    $v_mode->respond("Setting house to $state mode.");
+}
+
+# Toggle the house mode
+
+sub handle_mode_toggle_state() {
+    if ( $Save{mode} eq 'mute' ) {
+        $Save{mode} = 'offline';
+    }
+    elsif ( $Save{mode} eq 'offline' ) {
+        $Save{mode} = 'normal';
+    }
+    else {
+        $Save{mode} = 'mute';
+    }
+    set $mode_mh $Save{mode}, $v_mode_toggle;
+
+    # mode => unmuted cause speech even in mute or offline mode
+    $v_mode_toggle->respond("mode=unmuted app=control Now in $Save{mode} mode");
+}
+
+# Allow tk and web users to search the user code for strings
+# Set from web menu mh/web/ia5/house/search.shtml
+
+sub handle_search_code_string_state() {
+    my $state = state $search_code_string;
+    print "Searching for code $state\n";
+    my ( $results, $count, %files );
+    $count = 0;
+    $state =~ s/ /.+/;    # Let 'reload code' match 'reload xyz code'
+                          # quotemeta function?
+    $state =~ s/\//\\\//g;
+    $state =~ s/\\/\\\\/g;
+    $state =~ s/\(/\\\(/g;
+    $state =~ s/\)/\\\)/g;
+    $state =~ s/\$/\\\$/;
+    $state =~ s/\*/\\\*/g;
+
+    for my $file ( sort keys %User_Code ) {
+        my $n = 0;
+        for ( @{ $User_Code{$file} } ) {
+            $n++;
+            if (/$state/i) {
+                $count++;
+                $results .= "\nFile: $file:\n------------------------------\n"
+                  unless $files{$file}++;
+                $results .= sprintf( "%4d: %s", $n, $_ );
+            }
+        }
+    }
+    print_log "Found $count matches";
+    $results = "Found $count matches\n" . $results;
+    display $results, 60, 'Code Search Results', 'fixed' if $count;
+}
+
+# Create a list of all Voice_Cmd texts
+display join "\n", &Voice_Cmd::voice_items if said $v_list_voice_cmds;
+
+# Display the info text (set via the set_info() method) of all voice commands
+
+sub handle_voice_cmds_help_state() {
+    my @voice_commands = &Voice_Cmd::voice_items();
+    my $msg;
+
+    foreach my $voice_command (@voice_commands) {
+        my ( $category, $cmd ) = split ': ', $voice_command;
+        my ( $ref, $said, $vocab_cmd ) = &Voice_Cmd::voice_item_by_text($cmd);
+        $msg .= "$voice_command: $ref->{info}\n" if $ref->{info};
+    }
+
+    $v_voice_cmds_help->respond($msg);
+}
+
+# Create a list by X10 Addresses
+
+sub handle_list_x10_items_state() {
+    print_log "Listing X10 items";
+    my @object_list = (
+        &list_objects_by_type('X10_Item'),
+        &list_objects_by_type('X10_Appliance'),
+        &list_objects_by_type('X10_Garage_Door')
+    );
+    my @objects = map { &get_object_by_name($_) } @object_list;
+    my $results;
+    for my $object ( sort { $a->{x10_id} cmp $b->{x10_id} } @objects ) {
+        $results .= sprintf(
+            "Address:%-2s  File:%-15s  Object:%-30s State:%s\n",
+            substr( $object->{x10_id}, 1 ), $object->{filename},
+            $object->{object_name}, $object->{state}
+        );
+    }
+
+    #   display $results, 60, 'X10 Items', 'fixed';
+    respond
+      text  => $results,
+      time  => 60,
+      title => 'X10 Items',
+      font  => 'fixed'
+      if $results;
+    respond 'No items found' if !$results;
+}
+
+# Create a list by Serial States
+
+sub handle_list_serial_items_state() {
+    print_log "Listing serial items";
+    my @object_list = &list_objects_by_type('Serial_Item');
+    my @objects = map { &get_object_by_name($_) } @object_list;
+    my @results;
+
+    # Sort object by the first id
+    for my $object (@objects) {
+
+        #        my ($first_id, $states);
+        for my $id ( sort keys %{ $$object{state_by_id} } ) {
+            push @results,
+              sprintf(
+                "ID:%-5s File:%-15s Object:%-15s states: %s",
+                $id, $object->{filename},
+                $object->{object_name},
+                $$object{state_by_id}{$id}
+              );
+
+            #            $first_id = $id unless $first_id;
+            #            $states .= "$id=$$object{state_by_id}{$id}, ";
+        }
+
+        #       push @results, sprintf("ID:%-5s File:%-15s Object:%-15s states: %s",
+        #         $first_id, $object->{filename}, $object->{object_name}, $states);
+    }
+    my $results = join "\n", sort @results;
+
+    #   display $results, 60, 'Serial Items', 'fixed';
+    respond
+      text  => $results,
+      time  => 60,
+      title => 'Serial Items',
+      font  => 'fixed';
+}
+
+# Find a list of debug options code for $Debug{xyz}
+
+sub handle_list_debug_options_state() {
+    my ( %debug_options, $debug_string, $prev_index );
+    my %files = &file_read_dir('../lib/');
+    my @files = grep( /\.(pl|pm)$/i, values %files );
+    for my $file ( 'mh', @files ) {
+        print "reading $file\n";
+        for ( &file_read( $file, 2 ) ) {
+            $debug_options{$1}++ if /Debug\{['"]?(\S+?)['"]?\}/;
+        }
+    }
+    print "Reading user code\n";
+    for (@Sub_Code) {
+        $debug_options{$1}++ if /Debug\{['"]?(\S+?)['"]?\}/;
+    }
+    for my $key ( sort keys %debug_options ) {
+        if ( $prev_index ne substr( $key, 0, 1 ) ) {
+            $prev_index = substr( $key, 0, 1 );
+            $debug_string .= "\n";
+        }
+        $debug_string .= "$key ";
+    }
+
+    #   display "List of debug options:\n$debug_string";
+    respond text => "List of debug options:\n$debug_string";
+}
+
+# Echo serial matches
+&Serial_match_add_hook( \&serial_match_log ) if $Reload;
+
+sub serial_match_log {
+    my ( $ref, $state, $event ) = @_;
+    return unless $event =~ /^X/;    # Echo only X10 events
+    my ( $prefix, $name ) = $$ref{object_name} =~ /^(.)(.+)/g;
+
+    # don't log a message if being generated by an X10_Item contained object
+    # see lib/X10_Items for more info
+    return if $prefix eq '#';
+    print_log "$event: $name $state"
+      if $config_parms{x10_errata} > 1 and !$$ref{no_log};
+}
+
+# Allow for keyboard control
+if ($Keyboard) {
+    if ( $Keyboard eq 'F1' ) {
+        print "Key F1 pressed.  Reloading code\n";
+
+        # Must be done before the user code eval
+        push @Nextpass_Actions, \&read_code;
+    }
+    elsif ( $Keyboard eq 'F2' ) {
+        print "Key F2 pressed.  Toggling pause mode.\n";
+        &toggle_pause;    # Leaving pause mode is still done in mh code
+    }
+    elsif ( $Keyboard eq 'F3' ) {
+        print "Key F3 pressed.  Exiting.\n";
+        &exit_pgm;
+    }
+    elsif ( $Keyboard eq 'F4' ) {
+        print "Key F4 pressed.  Toggling debug.\n";    # defunct
+        &toggle_debug;
+    }
+    elsif ( $Keyboard eq 'F5' ) {
+        print "Key F3 pressed.  Toggling console logging.\n";
+        &toggle_log;
+    }
+    elsif ($Keyboard) {
+        print "key press: $Keyboard\n" if $Debug{misc};
+    }
+}
+
+# Monitor if web password was set or unset
+speak 'app=notice Web password was just set' if $Cookies{password_was_set};
+speak 'app=notice Notice, an invalid Web password was just specified'
+  if $Cookies{password_was_not_set};
+
+# Those with ups devices can set this seperatly
+# Those without a CM11 ... this will not hurt any
+
+if ($ControlX10::CM11::POWER_RESET) {
+    $ControlX10::CM11::POWER_RESET = 0;
+    set $Power_Supply 'Restored';
+    print_log 'CM11 power reset detected';
+}
+
+# Set back to normal 1 pass after restored
+if ( state_now $Power_Supply eq 'Restored' ) {
+    speak 'Power has been restored';
+    set $Power_Supply 'Normal';
+    display time => 0, text => "Detected a power reset";
+}
+
+# Process any backlogged X10 data
+if ($ControlX10::CM11::BACKLOG) {
+    print "X10:scheduling backlog\n";
+    set $x10_backlog_timer 1,
+      "process_serial_data('X$ControlX10::CM11::BACKLOG',1,undef)";
+    $ControlX10::CM11::BACKLOG = "";
+}
+
+# Repeat last spoken
+
+sub handle_repeat_last_spoken_state() {
+    ( $temp = $Speak_Log[0] ) =~ s/^.+?: //s;
+    $temp =~ s/^I said //s;    # In case we run this more than once in a row
+    $temp = lcfirst($temp);
+    respond "I said $temp";
+}
+
+# Clear the web cache directory
+
+sub handle_clear_cache_state() {
+    my $cmd = ($OS_win) ? 'del' : 'rm';
+    $cmd .= " $config_parms{html_alias_cache}/*.jpg";
+    $cmd .= " $config_parms{html_alias_cache}/*.wav";
+    $cmd =~ s|/|\\|g if $OS_win;
+    system $cmd;
+    print_log "Ran: $cmd";
+    respond "Web cache directory has been cleared.";
+}
+
+# Archive old logs
+if ($New_Month) {
+    print_log
+      "Archiving old print/speak logs: $config_parms{data_dir}/logs/print.log.old";
+    file_backup "$config_parms{data_dir}/logs/print.log.old", 'force';
+    file_backup "$config_parms{data_dir}/logs/speak.log.old", 'force';
+    file_backup "$config_parms{data_dir}/logs/error.log.old", 'force';
+}
+
+# Allow for commands to be entered via tk or web
+# Set from web menu mh/web/ia5/house/search.shtml
+
+sub handle_run_command_state() {
+    my $state  = state $run_command;
+    my $set_by = get_set_by $run_command;
+    print_log "Running External $set_by command: $state";
+    &process_external_command( $state, 1, $set_by );
+}
+
+# Allow web users to search the code
+# Set from web menu mh/web/ia5/house/search.shtml
+
+
+sub handle_search_command_string_state() {
+
+    # this next line shouldn't be neccessary, but it is
+    my $state   = state $search_command_string;
+    my @match   = &phrase_match($state);
+    my $results = "Matches for $state:\n";
+    my $i       = 1;
+    for my $cmd2 (@match) {
+        $results .= " $i: $cmd2\n";
+        $i++;
+    }
+
+    #    respond $results;
+    $search_command_string->respond($results);
+}
+
+# Undo the last action
+
+sub handle_undo_last_change_state() {
+    &undo_last_action($v_undo_last_change);
+}
+
+# Set up core MisterHouse modes like mode_mh (normal/mute/offline),
+# mode_vacation (on/off), mode_security (armed/unarmed),
+# mode_sleep (awake/sleeping parents/sleeping kids).
+# These modes can be controlled via the modes menu.
+
+# Grandfather in the $Save{mode} versions
+$mode_mh->set_states( 'normal', 'mute', 'offline' );
+
+sub handle_mode_mh_state() {
+    my $state = state $mode_mh;
+    $Save{mode} = $state;
+    $mode_mh->respond("mode=unmuted app=control Changed to $Save{mode} mode.");
+}
+
+$mode_security->set_states( 'armed', 'unarmed' );
+
+sub handle_mode_security_state() {
+    my $state = state $mode_security;
+    $Save{security} = $state;
+    $mode_security->respond("mode=unmuted app=control Security $state.");
+}
+
+$mode_occupied->set_states( 'home', 'work', 'vacation' );
+
+$mode_sleeping->set_states( 'nobody', 'parents', 'kids', 'all' );
+
+sub handle_mode_sleeping_state() {
+    my $state = state $mode_sleeping;
+    $Save{sleeping_parents} =
+      ( $state eq 'parents' or $state eq 'all' ) ? 1 : 0;
+    $Save{sleeping_kids} = ( $state eq 'kids' or $state eq 'all' ) ? 1 : 0;
+    $state = ucfirst($state);
+    $mode_sleeping->respond("mode=unmuted app=control $state are sleeping.");
+}
+
+# Convert any updated pod documentation to html
+
+   $Benchmark_Members{'mh_control'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of mh_control#-------------------------------------------------
+
+sub mh_release_loopcode {
+ print '   mh_release' if $Debug{user_code};
+   if ($Run_Members{'mh_release'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in mh_release.  Code was disabled', 0);        $Run_Members{'mh_release'} = 0; return;
+ }   elsif ($Run_Members{'mh_release'} > 2 and $Run_Members{'mh_release'} != $Run_Members_Error_Count{'mh_release'} )  {
+        display($Run_Members{'mh_release'}.' eval errors in mh_release out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'mh_release'} = $Run_Members{'mh_release'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category=MisterHouse
+
+$Category = 'MisterHouse';
+
+#@ This code will retrieve and parse the MH download page to
+#@ determine if a newer version is available.
+
+=begin comment
+
+ mh_release.pl
+ Created by Axel Brown
+
+ This code will retrieve and parse the MH download page to
+ determine if a newer version is available.
+
+ Revision History
+
+ Version 0.1		January 04, 2005
+ Version 0.2 - March, 2014, Use Github Tags URL, Ignore develop-ref version
+ And so it begins...
+
+=cut
+
+use JSON::PP ()
+  ; # Do not import any functions as it could conflict with the JSON imported functions from other locations in the code
+
+
+
+
+sub parse_version {
+    my ( $maj, $min ) = $Version =~ /(\d)\.(\d*)/;
+    my ($rev) = $Version =~ /R(\d*)/;
+    $maj = $Version unless ($maj);
+    my $version_str = $maj;
+    $version_str .= ".$min" unless ( $min eq '' );
+    $version_str .= " (revision $rev)" if ($rev);
+    return ( $maj, $min, $version_str );
+}
+
+sub calc_age {
+
+    #Get the time sent in. This is UTC
+    my $time = shift;
+
+    #*** This is a hack (same as earthquakes)
+    #*** Surely PERL can turn a date string into a time hash!
+    my ( $qyear, $qmnth, $qdate ) = $time =~ m!(\d+)-(\d+)-(\d+)T!;
+
+    my $diff = ( time - timelocal( 0, 0, 0, $qdate, $qmnth - 1, $qyear ) );
+
+    my $days_ago = int( $diff / ( 60 * 60 * 24 ) );
+    return 'today'                    if !$days_ago;
+    return 'yesterday'                if $days_ago == 1;
+    return 'the day before yesterday' if $days_ago == 2;
+    return "$days_ago days ago"       if $days_ago < 7;
+    my $weeks = int( $days_ago / 7 );
+    my $days  = $days_ago % 7;
+    return
+        "$weeks week"
+      . ( ( $weeks == 1 ) ? '' : 's' )
+      . (
+        ( !$days ) ? '' : ( " and $days day" . ( ( $days == 1 ) ? '' : 's' ) ) )
+      . " ago";
+}
+
+if ( said $v_version) {
+
+    my ( $maj, $min, $version_str ) = &parse_version();
+
+    if (
+        (
+               ( $Save{mhdl_maj} > $maj )
+            or ( ( $Save{mhdl_maj} == $maj ) and ( $Save{mhdl_min} > $min ) )
+        )
+        and ( $maj !~ m/^develop-ref/ )
+      )
+    {
+        respond(
+            "app=control I am version $version_str and $Save{mhdl_maj}.$Save{mhdl_min} was released "
+              . &calc_age( $Save{mhdl_date} )
+              . '.' );
+    }
+    elsif ( $maj =~ m/^develop-ref/ ) {
+        respond(
+            "app=control You are running the development branch, it has no version releases."
+        );
+    }
+    else {
+        respond("app=control I am version $version_str.");
+    }
+}
+
+if ( said $v_mhdl_page) {
+
+    my $msg;
+
+    if (&net_connect_check) {
+        $msg = 'Checking version...';
+        print_log("Retrieving download page");
+        start $p_mhdl_page;
+    }
+    else {
+        $msg =
+          "app=control Unable to check version while disconnected from the Internet";
+    }
+
+    $v_mhdl_page->respond("app=control $msg");
+}
+
+if ( done_now $p_mhdl_page) {
+    my @html = file_read($mhdl_file);
+    print_log("Download page retrieved");
+    my $json = JSON::PP::decode_json(@html)
+      ; # Use the PP version of the call as otherwise this function fails at least on OS X 10.9.4 with Perl 5.18.2
+    my ( $mhdl_date_url, $maj, $min );
+    foreach ( @{$json} ) {
+        next unless $_->{name} =~ m/^v(\d+)\.(\d+)/;
+        next unless ( ( $1 > $maj ) or ( $1 == $maj and $2 > $min ) );
+        $maj           = $1;
+        $min           = $2;
+        $mhdl_date_url = $_->{commit}{url};
+    }
+    $Save{mhdl_maj} = $maj;
+    $Save{mhdl_min} = $min;
+    my $msg;
+    if (&net_connect_check) {
+        $msg = 'Checking version date...';
+        print_log("Retrieving download date page");
+        set $p_mhdl_date_page
+          "get_url -quiet \"$mhdl_date_url\" \"$mhdl_date_file\"";
+        start $p_mhdl_date_page;
+    }
+    else {
+        $msg =
+          "app=control Unable to check version date while disconnected from the Internet";
+    }
+    respond("app=control $msg");
+}
+
+if ( done_now $p_mhdl_date_page) {
+    my @html = file_read($mhdl_date_file);
+    print_log("Download date page retrieved");
+    my $json = JSON::PP::decode_json(@html);
+    $Save{mhdl_date} = $json->{commit}{author}{date};
+    if ( defined $Save{mhdl_maj} and defined $Save{mhdl_min} ) {
+        my ( $maj, $min, $version_str ) = &parse_version();
+        if (
+            (
+                   ( $Save{mhdl_maj} > $maj )
+                or
+                ( ( $Save{mhdl_maj} == $maj ) and ( $Save{mhdl_min} > $min ) )
+            )
+            and ( $maj !~ m/^develop-ref/ )
+          )
+        {
+            respond(
+                "important=1 connected=0 app=control I am version $version_str and version $Save{mhdl_maj}.$Save{mhdl_min} was released "
+                  . &calc_age( $Save{mhdl_date} . '.' ) );
+        }
+        elsif ( $maj =~ m/^develop-ref/ ) {
+            respond(
+                "connected=0 app=control You are running the development branch, it has no version releases."
+            );
+        }
+        else {
+            # Voice command is only code to start this process, so check its set_by
+            respond("connected=0 app=control Version $version_str is current.");
+        }
+    }
+}
+
+# create trigger to download version info at 6PM (or on dial-up connect)
+
+if ($Reload) {
+    if ( $Run_Members{'internet_dialup'} ) {
+        &trigger_set(
+            "state_now \$net_connect eq 'connected'",
+            "run_voice_cmd 'Check Misterhouse version'",
+            'NoExpire',
+            'get MH version'
+        ) unless &trigger_get('get MH version');
+    }
+    else {
+        &trigger_set(
+            "time_cron '0 18 * * *' and net_connect_check",
+            "run_voice_cmd 'Check Misterhouse version'",
+            'NoExpire',
+            'get MH version'
+        ) unless &trigger_get('get MH version');
+    }
+}
+   $Benchmark_Members{'mh_release'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of mh_release#-------------------------------------------------
+
+sub mh_sound_loopcode {
+ print '   mh_sound' if $Debug{user_code};
+   if ($Run_Members{'mh_sound'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in mh_sound.  Code was disabled', 0);        $Run_Members{'mh_sound'} = 0; return;
+ }   elsif ($Run_Members{'mh_sound'} > 2 and $Run_Members{'mh_sound'} != $Run_Members_Error_Count{'mh_sound'} )  {
+        display($Run_Members{'mh_sound'}.' eval errors in mh_sound out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'mh_sound'} = $Run_Members{'mh_sound'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = MisterHouse
+
+$Category = 'MisterHouse';
+
+# $Date$
+# $Revision$
+
+#@ Controls sound volume durring speak and play events.
+
+# Here is what this code does:
+#  - Controls volume and sets a object whenever speak or play is called
+#  - Sets the mh_speakers object, which can be used to control relay
+#    controlled speakers on and off before and after TTS and wave
+#    file sounds (see mh/code/bruce/pa_control.pl).
+#  - Plays the mh.ini sound_pre wav file before all sounds.
+#    Useful if you want to add delay, or an activation noise for things
+#    NOTE: Use speak_chime module instead! Old method is not being maintained.
+#    like VOX (Voice Activated) Radios .
+#  - Allows for restarting voice engines
+
+$Info{Volume_Control} = 'Command Line'
+  if $Reload
+  and $config_parms{volume_master_get_cmd}
+  and $config_parms{volume_master_set_cmd};
+
+################################################
+# Allow for default volume control. Reset on startup.
+################################################
+
+   $Benchmark_Members{'mh_sound'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of mh_sound#-------------------------------------------------
+
+sub mhsend_server_loopcode {
+ print '   mhsend_server' if $Debug{user_code};
+   if ($Run_Members{'mhsend_server'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in mhsend_server.  Code was disabled', 0);        $Run_Members{'mhsend_server'} = 0; return;
+ }   elsif ($Run_Members{'mhsend_server'} > 2 and $Run_Members{'mhsend_server'} != $Run_Members_Error_Count{'mhsend_server'} )  {
+        display($Run_Members{'mhsend_server'}.' eval errors in mhsend_server out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'mhsend_server'} = $Run_Members{'mhsend_server'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = MisterHouse
+
+$Category = 'MisterHouse';
+
+#@ Reads incoming data from a socket port and do stuff with it.
+#@ An example client that talks with this is mh/bin/mhsend
+
+
+# Create mh/data/mhsend directory at startup, if missing
+mkdir( "$config_parms{data_dir}/mhsend", 0777 )
+  if $Startup and !-d "$config_parms{data_dir}/mhsend";
+
+if ( my $header = said $mhsend_server) {
+
+    my ( $msg, $user, $password, $authorized, $response );
+
+    # Format of incoming data:
+    #  Request
+    #  Authorization: Basic  xxxx
+    #
+    #  data
+
+    my ( $action, $action_arg ) = $header =~ /^(\S+) *(\S*)/;
+    $action = lc $action;
+    my ( $name, $name_short );
+
+    #   my ($name, $name_short) = net_domain_name('server_data');
+    print_log
+      "Received server_data data: name=$name: action=$action arg=$action_arg"
+      unless $config_parms{no_log} =~ /mhsend_server/;
+
+    # Read header and optional password (until blank record)
+    my $handle = handle $mhsend_server;
+    while (<$handle>) {
+        last unless /\S/;
+        if (/Authorization: Basic (\S+)/) {
+            ( $user, $password ) = split( ':', unpack( "u", $1 ) );
+
+            #           ($user, $password) = split(':', decode_base64 $1);
+        }
+        if ( $user = password_check $password, 'server_mhsend' ) {
+            $authorized = $user;
+        }
+        else {
+            $response = "mhsend password bad\n";
+        }
+    }
+
+    # Now read the data
+    while (<$handle>) {
+        $msg .= $_;
+    }
+
+    if ( $Password_Allow{$action} eq 'anyone'
+        or ( $action eq 'run' and $Password_Allow{$msg} eq 'anyone' ) )
+    {
+        $authorized = 'anyone';
+    }
+
+    if ( !$authorized ) {
+        $response = "Action is not authorized: $action $msg";
+    }
+    elsif ( $action eq 'display' ) {
+        $action_arg = 120 unless defined $action_arg;
+        display( $msg, $action_arg, "Internet Message from $name" );
+        display
+          text        => $msg,
+          time        => $action_arg,
+          title       => 'Mhsend message',
+          window_name => 'mssend',
+          append      => 'bottom';
+
+        #       print_msg "mhsend: $msg";
+        $response = "Data was displayed for $action_arg seconds";
+        logit( "$config_parms{data_dir}/mhsend/display.log", $msg )
+          ;    # Also logit
+    }
+    elsif ( $action eq 'state' ) {
+        my $state = eval "state $msg";
+        $response = $state;
+    }
+    elsif ( $action eq 'speak' ) {
+        if ( length $msg < 400 ) {
+            speak $msg;
+            $response = "Data was spoken";
+        }
+        else {
+            display( $msg, 120, "Internet Message from $name" );
+            $response =
+              "Data was too long ... it was displayed instead of being spoken";
+        }
+    }
+    elsif ( $action eq 'run' ) {
+        $msg =~ s/\n|\r//g;
+
+        #       if (&run_voice_cmd($msg)) {
+        #       my $respond = "object_set name=mhsend_server";
+        my $respond = "mhsend name=mhsend_server ";
+        $respond .=
+          "proxyip=" . $Socket_Ports{'server_mhsend'}{client_ip_address};
+        if ( &process_external_command( $msg, 0, 'mhsend', $respond ) ) {
+            $response = "Command was run: $msg";
+        }
+        else {
+            $response = "Command not found: $msg";
+        }
+    }
+    elsif ( $action eq 'file' ) {
+        file_write( "$config_parms{data_dir}/mhsend/$action_arg", $msg );
+        $response = "Data was filed to $action_arg";
+    }
+    elsif ( $action eq 'log' ) {
+        $action_arg = 'default' unless $action_arg;
+
+        #       logit("$config_parms{data_dir}/mhsend/$action_arg.log", $msg, 0);
+        logit( "$config_parms{data_dir}/mhsend/$action_arg.log", $msg );
+        $response = "Data was logged $action_arg.log";
+    }
+
+    print_log $response unless $config_parms{no_log} =~ /mhsend_server/;
+    print "mhsend_server: $response\n"
+      unless $config_parms{no_log} =~ /mhsend_server/;
+    print $handle $response;
+
+}
+
+sub respond_mhsend {
+
+    #   my $handle = handle $mhsend_server;
+    #   print $handle $response;
+    #   print_log "mhsend response: @_";
+    &respond_default(@_);
+}
+
+   $Benchmark_Members{'mhsend_server'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of mhsend_server#-------------------------------------------------
+
+sub organizer_loopcode {
+ print '   organizer' if $Debug{user_code};
+   if ($Run_Members{'organizer'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in organizer.  Code was disabled', 0);        $Run_Members{'organizer'} = 0; return;
+ }   elsif ($Run_Members{'organizer'} > 2 and $Run_Members{'organizer'} != $Run_Members_Error_Count{'organizer'} )  {
+        display($Run_Members{'organizer'}.' eval errors in organizer out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'organizer'} = $Run_Members{'organizer'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = Time
+
+$Category = 'Time';
+
+#@ This module is a significant update from MH v2, and has a few functions;
+#@<br>
+#@ <ul>
+#@ <li> iCal2vsDB syncronization control. Imports iCal files (Apple iCal,
+#@   Mozilla Sunbird) into MH as standard calendars, or holiday/vacation
+#@   calendars.
+#@ <li> New in v3.1 now can control objects using a control calendar
+#@ <li> Monitors the vsDB calendar and todo files and creates required events
+#@   to process these items (creates organizer_*.pl files in the code dir)
+#@ <li> Implements an Organizer_Events class for manipulating events, holidays
+#@   and vacations.
+#@ <li> Automatically updates vsDB 'databases' with the new required fields
+#@<br>
+#@ Minimum Requirements: calendar.pl 1.6.0-3 and tasks.pl 1.4.8-4 (Misterhouse v2.104)
+
+=begin comment
+
+mh.ini parameters required
+
+organizer_dir (mandatory).  Set to the location where your organizer data will be stored
+organizer_email (optional).  Required if email notices are used.  The first entry will be
+       considered the default for notices that don't map to assignments (e.g., to-do).
+       Example: organizer_email = fred => fred@flintstone.net, wilma => wilma@flintstone.net
+       Note requirement that keys be lowercase.
+organizer_announce_day_times (optional) overides the default times when announcements occur
+       on the day of a to-do or event.  Example:
+       organizer_announce_day_times = 8:00 am, 9:00 am
+       Note case and space between number and "am".
+organizer_announce_priorday_times (optional) overides the default times when announcements
+       occur prior to the day of a to-do or event.
+ical_read_interval (optional). Defaults to 0 which will prevent periodic iCal reading.
+       Set to a value in minutes
+
+for Automatic i2v.cfg generation add the following mh.ini parameters;
+ical2vsdb_<name> = url to ical file
+
+url examples:
+http://server/path/to/icalfile.ics
+https://server/path/to/icalfile.ics
+file://path/to/icalfile.ics
+http://user@pass:server/file.ics
+
+ical2vsdb_<name>_options = comma delimited list of ical processing options
+
+Options available:
+
+speak_cal 	to speak calendar entries
+speak_todo 	to speak task entries
+holiday		calendar entries should be treated as holiday time
+vacation	calendar entries should be treated as vacation time
+name=XXXX	set source name to XXX rather than parse it from inside the ical
+
+Changed in ical2vsdb 4
+nodcsfix	most calendar servers (ie google) need a second level parse. Set this if the ical
+		isn't being processed
+nosync_dtstamp	some calendars (ie google) update the dtstamp field each time the calendar
+		is downloaded, such that it is processed each time. ical2vsdb syncs these fields
+		ensuring that ical2vsdb only runs when the calendar has changed. Set this if there is
+		too much processing not if non-google calendars aren't being processed
+control		For dedicated item control calendars. MH objects with the same name as the
+		event will be turned on during the event duration
+
+ie
+ical2vsdb_account1 = http://house/holical.ics
+ical2vsdb_account1_options = holiday, speak_cal, name=testing account
+
+other mh.ini options;
+
+ical_days_before	Number of days back in the past to import
+ical_days_after		Number of days in the future to import
+ical_local_cache_dir    Local cache directory
+
+iCal2vsDB uses iCal::Parser, which has several significant dependancies to operate correctly,
+these have been included in lib/site
+
+for https access Crypt::SSLeay needs to be installed manually as well
+
+=cut
+
+package Organizer_Events;
+
+@Organizer_Events::ISA = ('Generic_Item');
+
+sub new {
+    my ($class) = @_;
+    my $self = {};
+    bless $self, $class;
+    $self->reset();
+    return $self;
+}
+
+sub add {
+    my ( $self, %data ) = @_;
+    push @{ $$self{_events} }, \%data;
+}
+
+sub reset {
+    my ($self) = @_;
+    @{ $$self{_events} } = ();
+}
+
+sub evaluate {
+    my ($self) = @_;
+    @{ $$self{_active_events} } = ();
+    foreach my $event ( @{ $$self{_events} } ) {
+        if (   &main::time_greater_or_equal( $$event{startdt} )
+            && &main::time_less_or_equal( $$event{enddt} ) )
+        {
+            push @{ $$self{_active_events} }, $event;
+        }
+    }
+
+    # TO-DO: need to distinguish between a new event which is making the state active again
+    #        vs. the same (set of) event(s) causing the state to be active
+    if ( @{ $$self{_active_events} } ) {
+        if ( $self->state ne 'active' ) {
+            $self->set('active');
+            print "setting $$self{object_name} active\n";
+        }
+    }
+    else {
+        if ( $self->state ne 'inactive' ) {
+            $self->set('inactive');
+            print "setting $$self{object_name} " . $self->state . "\n";
+        }
+    }
+}
+
+sub active_events {
+    my ($self) = @_;
+    return @{ $$self{_active_events} };
+}
+
+sub is_active_today {
+    my ($self) = @_;
+    return $self->is_active_on_day(0);
+}
+
+sub is_active_tomorrow {
+    my ($self) = @_;
+    return $self->is_active_on_day(1);
+}
+
+sub is_active_on_day {
+    my ( $self, $day ) = @_;
+    my ($now_date) = $main::Time_Date =~ /(\S+)\s+\S+/;
+    my $comparetime =
+      &main::my_str2time( "$now_date 12:00 am + " . ( $day * 24 ) . ":00" );
+    foreach my $event ( @{ $$self{_events} } ) {
+        my $eventtime = &main::my_str2time( $$event{startdt} );
+        my $timediff  = $eventtime - $comparetime;
+        if ( $timediff >= 0 and $timediff < ( 60 * 60 * 24 ) ) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+package main;
+
+use File::Copy;
+use vsDB;
+
+# PUBLIC objects:
+
+
+
+
+
+
+# PRIVATE data
+
+
+
+
+if ($Reload) {
+    set_watch $_organizer_cal;
+    set_watch $_organizer_todo;
+
+    #$p_ical2vsdb->set("ical2vsdb $_ical2db_config_path $_ical2db_output_dir $main::config_parms{date_format}");
+
+    &read_parm_hash( \%_organizer_emails,
+        $main::config_parms{organizer_email} );
+
+    # setup default announce times
+    @_organizer_announce_day_times =
+      split( /\s*,\s*/, $main::config_parms{organizer_announce_day_times} )
+      if defined $main::config_parms{organizer_announce_day_times};
+    @_organizer_announce_priorday_times =
+      split( /\s*,\s*/, $main::config_parms{organizer_announce_priorday_times} )
+      if defined $main::config_parms{organizer_announce_priorday_times};
+
+    #Check to see if calendar and organizer databases need upgrade
+    my @_upd_cal = (
+        'DATE',     'TIME',    'EVENT',    'CATEGORY',
+        'DETAILS',  'HOLIDAY', 'VACATION', 'SOURCE',
+        'REMINDER', 'ENDTIME', 'CONTROL'
+    );
+    $calOk = &update_vsdb( 'Calendar', $_organizer_cal->name, @_upd_cal );
+
+    my @_upd_todo = (
+        'Complete',  'Description', 'DueDate', 'AssignedTo',
+        'Notes',     'SPEAK',       'SOURCE',  'REMINDER',
+        'STARTDATE', 'CATEGORY'
+    );
+    $todoOk = &update_vsdb( 'Todo', $_organizer_todo->name, @_upd_todo );
+
+    #Auto generate i2v.cfg file from mh.ini entries
+    if ( $config_parms{ical_read_interval} ) {
+
+        my $icals;
+        my $options;
+        my $data = "cfg_version\t2\n";
+
+        foreach my $parm ( sort keys %config_parms ) {
+            next unless $config_parms{$parm};    # Ignore blank parms
+            next if ( $parm =~ /MHINTERNAL/ );
+
+            if ( $parm =~ /^ical2vsdb_(\S+)_option/ ) {
+                $options->{$1} = $config_parms{$parm};
+            }
+            elsif ( $parm =~ /^ical2vsdb_(\S+)/ ) {
+                $icals->{$1} = $config_parms{$parm};
+            }
+        }
+
+        foreach my $ical ( sort keys %$icals ) {
+
+            #print_log "i=$ical, icals->{$ical}\n";
+            $data .= "ical\t";
+            $data .= $icals->{$ical};
+            $data .= "\t" . $options->{$ical} if ( defined $options->{$ical} );
+            $data .= "\n";
+        }
+
+        if ($data) {
+            $data =
+                "#\n# Autogenerated code at "
+              . $Date_Now . " "
+              . $Time_Now . "\n#\n"
+              . $data;
+            $data .= "\n#Options\n";
+            $data .= "days_before\t" . $config_parms{ical_days_before} . "\n"
+              if $config_parms{ical_days_before};
+            $data .= "days_after\t" . $config_parms{ical_days_after} . "\n"
+              if $config_parms{ical_days_after};
+            $data .=
+              "local_cache_dir\t" . $config_parms{ical_local_cache_dir} . "\n"
+              if $config_parms{ical_local_cache_dir};
+            $data .=
+              "\n#Required\nsleep_delay\t0\n\n#\n# Autogeneration complete.\n#\n"
+              if $data;
+            &write_i2v($data);
+        }
+    }
+}
+
+if ( new_minute(1) ) {
+    $organizer_events->evaluate();
+    $organizer_holidays->evaluate();
+    $organizer_vacation->evaluate();
+}
+
+# default to 0 so that ical reading is not automatic unless enabled explicitely.
+if ( said $v_get_ical_data
+    or ( ($ical_read_interval) && new_minute($ical_read_interval) ) )
+{
+
+    if ( said $v_get_ical_data eq "Force" ) {
+        &main::print_log("Organizer: Forcing calendar update");
+        if ( unlink("$config_parms{organizer_dir}/ical2vsdb.md5") ) {
+
+            #   $v_get_ical_data->respond("iCal force successful. Data retrieval will occur on next scheduled.");
+        }
+        else {
+            $v_get_ical_data->respond(
+                "iCal force unsuccessful.  Please check permissions on $config_parms{organizer_dir}/ical2vsdb.md5"
+            );
+        }
+    }
+    elsif ( said $v_get_ical_data eq "Purge" ) {
+        &main::print_log("Organizer: Purging iCal data from calendars");
+        $p_ical2vsdb->set("ical2vsdb --purge-ical-info $_ical2db_output_dir");
+        start $p_ical2vsdb;
+    }
+
+    elsif ( -e $_ical2db_config_path ) {
+        $p_ical2vsdb->set(
+            "ical2vsdb $_ical2db_config_path $_ical2db_output_dir $main::config_parms{date_format}"
+        );
+        start $p_ical2vsdb;
+    }
+    else {
+        &main::print_log("Organizer: Cannot find configuration file!");
+    }
+}
+
+if (
+    $calOk
+    and (  $Reload
+        or said $organizer_check
+        or ( $New_Minute and changed $_organizer_cal) )
+  )
+{
+    &main::print_log('Organizer: Reading updated organizer calendar file now');
+    set_watch $_organizer_cal;    # Reset so changed function works
+    my ($objDB) = new vsDB( file => $_organizer_cal->name, delimiter => '\t' );
+
+    # set objDB to sort on DATE
+    $objDB->Sort('DATE');
+    print $objDB->LastError unless $objDB->Open;
+
+    # reset the three organizer objects to avoid memory leaks
+    $organizer_vacation->reset();
+    $organizer_holidays->reset();
+    $organizer_events->reset();
+
+    my $mycode = "$Code_Dirs[0]/organizer_events.pl";
+    open( MYCODE, ">$mycode" )
+      or &main::print_log("Organizer: Error in open on $mycode: $!");
+    print MYCODE "\n# Category = Time\n";
+
+$Category = 'Time\n";';
+    print MYCODE "\n#@ Auto-generated from Organizer\n\n";
+    print MYCODE "if (\$New_Minute) {\n";
+    while ( !$objDB->EOF ) {
+        my (%data);
+        eval {
+            $data{type} = 'event';
+            my @date = split '\.', $objDB->FieldValue('DATE');
+            $data{date} =
+              ( $config_parms{date_format} =~ /ddmm/ )
+              ? "$date[2]/$date[1]/$date[0]"
+              : "$date[1]/$date[2]/$date[0]";
+            $data{time} = $objDB->FieldValue('TIME');
+            if ( $data{time} ) {
+
+                # TO-DO: force time entry to be legitimate (i.e., no "24hr time"--only am/pm time)
+            }
+            else {
+                $data{time} = "12:00 am";
+            }
+            $data{description} = $objDB->FieldValue('EVENT');
+            $data{reminder}    = $objDB->FieldValue('REMINDER');
+            $data{category}    = $objDB->FieldValue('CATEGORY');
+            $data{endtime}     = $objDB->FieldValue('ENDTIME');
+            $data{control}     = $objDB->FieldValue('CONTROL');
+            $data{endtime} =
+              ( !( $data{endtime} ) && $data{time} )
+              ? $data{time}
+              : $data{endtime};
+            $data{allday}  = ( $data{time} eq $data{endtime} ) ? 'Yes' : 'No';
+            $data{notes}   = $objDB->FieldValue('DETAILS');
+            $data{startdt} = $data{date} . ' '
+              . ( ( $data{time} ) ? $data{time} : "12:00 am" );
+            $data{enddt} =
+              $data{date} . ' '
+              . (
+                ( $data{endtime} && $data{endtime} !~ /12:00 am/i )
+                ? $data{endtime}
+                : "11:59 pm"
+              );
+
+            #changed to notify an array of email addresses
+            $data{name_count} = 0;
+            foreach my $emailname ( keys %_organizer_emails ) {
+
+                #$data{name} = $emailname;
+                #last;
+                $data{name_count}++;
+                $data{name}[ $data{name_count} ] = $emailname;
+            }
+
+            if (   $objDB->FieldValue('VACATION') =~ /on/i
+                or $data{category} =~ /vacation/i )
+            {
+                $organizer_vacation->add(%data);
+            }
+            elsif ($objDB->FieldValue('HOLIDAY') =~ /on/i
+                or $data{category} =~ /holiday/i )
+            {
+                $organizer_holidays->add(%data);
+            }
+            else {
+                $organizer_events->add(%data);
+            }
+
+            $objDB->MoveNext;
+
+            # protect against bad dates
+            if ( $data{startdt} && !( &main::my_str2time( $data{startdt} ) ) ) {
+                &main::print_log(
+                    "Bad start time format: $data{startdt} encountered in calendar"
+                );
+                next;
+            }
+            if ( $data{enddt} && !( &main::my_str2time( $data{enddt} ) ) ) {
+                &main::print_log(
+                    "Bad end time format: $data{enddt} encountered in calendar"
+                );
+                next;
+            }
+            my $fh = *MYCODE;
+            &generate_code( $fh, %data );
+
+        };
+        print "Error encountered while processing calendar data: $@\n" if $@;
+        %data = undef;
+    }
+    print MYCODE "}\n";
+    close MYCODE;
+    $objDB->Close;
+
+    $organizer_vacation->evaluate();
+    $organizer_holidays->evaluate();
+    $organizer_events->evaluate();
+
+    do_user_file $mycode;
+}
+
+if (
+    $todoOk
+    and (  $Reload
+        or said $organizer_check
+        or ( $New_Minute and changed $_organizer_todo) )
+  )
+{
+    &main::print_log('Organizer: Reading updated organizer todo file');
+    set_watch $_organizer_todo;    # Reset so changed function works
+    my ($objDB) = new vsDB( file => $_organizer_todo->name, delimiter => '\t' );
+    print $objDB->LastError unless $objDB->Open;
+    my $mycode = "$Code_Dirs[0]/organizer_tasks.pl";
+    open( MYCODE, ">$mycode" )
+      or &main::print_log("Error in open on $mycode: $!");
+    print MYCODE "\n# Category = Time\n";
+
+$Category = 'Time\n";';
+    print MYCODE "\n#@ Auto-generated from Organizer\n\n";
+    print MYCODE "if (\$New_Minute) {\n";
+
+    while ( !$objDB->EOF ) {
+        my (%data);
+        eval {
+            my $complete = $objDB->FieldValue('Complete');
+            my $duedate  = $objDB->FieldValue('DueDate');
+            my ( $date, $time ) = $duedate =~ /^(\S+)\s+(\S+\s+\S+)/;
+            $date = $duedate unless $date;
+            $data{type}   = 'task';
+            $data{date}   = $date;
+            $data{time}   = $time;
+            $data{allday} = 'Yes' if $data{time} and $data{time} =~ /12:00 am/i;
+            $data{reminder}    = $objDB->FieldValue('REMINDER');
+            $data{name}        = $objDB->FieldValue('AssignedTo');
+            $data{description} = $objDB->FieldValue('Description');
+            $data{notes}       = $objDB->FieldValue('Notes');
+            $data{speak}       = $objDB->FieldValue('SPEAK');
+            $data{startdt}     = $objDB->FieldValue('STARTDATE');
+            $data{category}    = $objDB->FieldValue('CATEGORY');
+            $data{enddt}       = $data{date} . ' ' . $data{time};
+            $objDB->MoveNext;
+            next if lc $complete =~ /^y/i;
+            next unless $data{name} or $data{description};
+            next unless $data{date};
+            my $evaldt =
+              ( $data{time} )
+              ? $data{date} . ' ' . $data{time}
+              : $data{date} . ' 12:00 am';
+            next
+              unless time_less_than("$evaldt + 23:59")
+              ;    # Skip past and invalid events
+                   # protect against bad dates
+
+            if ( $data{startdt} && !( &main::my_str2time( $data{startdt} ) ) ) {
+                &main::print_log(
+                    "Bad start time format: $data{startdt} encountered in tasks"
+                );
+                next;
+            }
+            if ( $data{enddt} && !( &main::my_str2time( $data{enddt} ) ) ) {
+                &main::print_log(
+                    "Bad end time format: $data{enddt} encountered in tasks");
+                next;
+            }
+            my $fh = *MYCODE;
+            &generate_code( $fh, %data );
+        };
+        print "Error encountered while processing tasks: $@\n" if $@;
+        %data = undef;
+    }
+    print MYCODE "\n#@ Speak tasks administratively disabled\n\n"
+      if ( !$speak_tasks );
+    print MYCODE "}\n";
+    close MYCODE;
+    $objDB->Close;
+    do_user_file $mycode;
+}
+
+sub get_speak_code {
+    my (%data) = @_;
+    my $speak_code = '';
+    if ( $data{type} =~ /task/i ) {
+        $speak_code = "Task notice for $data{name}, $data{description}.";
+        $speak_code .= $data{notes} if $data{notes};
+    }
+    else {
+        if ( $data{allday} =~ /^y/i ) {
+            if ( $data{reminder_diff} == 1 ) {
+                $speak_code = "Calendar notice.  Tomorrow: $data{description}.";
+            }
+            elsif ( $data{reminder_diff} == 0 ) {
+                $speak_code = "Calendar notice.  Today: $data{description}.";
+            }
+            else {
+                $speak_code =
+                  "Calendar notice.  In $data{reminder_diff} days: $data{description}.";
+            }
+        }
+        elsif ( $data{reminder_diff} ) {
+            $speak_code =
+              "Calendar Notice.  In $data{reminder_time} $data{reminder_units}"
+              . ( ( $data{reminder_time} > 1 ) ? 's' : '' )
+              . ", $data{description}.";
+        }
+        else {
+            $speak_code = "Calendar notice at $data{time}: $data{description}";
+        }
+    }
+    if ($speak_code) {
+        $speak_code =~ s/'/\\'/g;
+        $speak_code =
+          "speak (\'app=organizer $speak_code\'); display (\'app=organizer $speak_code\');";
+    }
+    return $speak_code;
+}
+
+sub get_textmsg_code {
+    my (%data)  = @_;
+    my $notes   = '';
+    my $subject = $data{description};
+    if ( $data{type} =~ /task/i ) {
+        $notes .= "$data{notes}. "  if $data{notes};
+        $notes .= "Due $data{date}" if $data{date};
+        $notes .= " at $data{time}"
+          if $data{time} and $data{time} !~ /12:00 am/i;
+    }
+    else {
+        $notes .= "Occuring on $data{date}";
+    }
+
+    my $email;
+
+    #changed to new array reference
+    for ( my $index = 1; $index <= $data{name_count}; $index++ ) {
+        $email .=
+          "net_mail_send to => '$_organizer_emails{lc $data{name}[$index]}', subject => q~$subject~, text => q~$notes~; ";
+    }
+    return $email;
+}
+
+sub generate_code {
+    my ( $fh, %data ) = @_;
+    $data{time_date} = "$data{date} $data{time}";
+    my $default_reminder = $main::config_parms{organizer_reminder};
+    $default_reminder = '15m' unless $default_reminder;
+    $data{reminder} = $default_reminder
+      unless $data{reminder}
+      or $data{allday} =~ /^y/i;
+
+    #print_log "organizerDB: data{type}=$data{type} data{control}=$data{control} data{desc}=$data{description}";
+
+    my $task_flag = $main::config_parms{organizer_vc_category};
+    if (
+           ($task_flag)
+        && ( $data{type} eq 'task' )
+        && (   ( $data{category} and ( $data{category} =~ /^$task_flag/i ) )
+            or ( $data{description} =~ /^$task_flag/i ) )
+      )
+    {
+        my $cmd = $data{description};
+        $task_flag .= ":";
+        $cmd =~ s/$task_flag\s*//;  # trim of the prefix/identifier if it exists
+        my $vc = '';
+        eval { $vc = &Voice_Cmd::voice_item_by_text("$cmd"); };
+        if ($vc) {
+            my $offcmd = $cmd;
+            $offcmd =~ s/(\s+)on(\s*)/$1off$2/;
+            if ( $data{startdt} ) {
+                print MYCODE
+                  "   if (time_now '$data{startdt}') { &main::run_voice_cmd('$cmd'); };\n";
+            }
+            if ( $data{enddt} and $offcmd ) {
+                print MYCODE
+                  "   if (time_now '$data{enddt}') { &main::run_voice_cmd('$offcmd'); };\n";
+            }
+        }
+        return;
+    }
+
+    # control calendars turn item on and off. Note that this only tests if an object exists. A better way
+    # might be to check if on & off are valid states...
+    if ( ( $data{type} eq 'event' ) and ( $data{control} eq 'on' ) ) {
+        my $obj = $data{description};
+
+        #&main::print_log("organizerDB: found control event $obj starting $data{startdt} ending $data{enddt}");
+        my $obj_test  = '';
+        my $obj_state = '';
+        eval {
+            $obj_test  = &main::get_object_by_name($obj);
+            $obj_state = state $obj_test;
+        };
+        if ($obj_state) {
+            if ( ( $data{startdt} ) and ( $data{enddt} ) ) {
+                print MYCODE
+                  "if (time_now '$data{startdt}') { set \$$obj ON; }; #Control Event\n";
+                print MYCODE
+                  "if (time_now '$data{enddt}') { set \$$obj OFF; }; #Control Event\n";
+            }
+            else {
+                &main::print_log(
+                    "Organizer: Warning, invalid times for event object $obj. Ignoring Event on $data{startdt}"
+                );
+            }
+        }
+        else {
+            &main::print_log(
+                "Organizer: Warning, cannot determing state of event object $obj. This item might not exist. Ignoring Event on $data{startdt}"
+            );
+        }
+        return;
+    }
+
+    if ( $data{reminder}
+        and
+        !( time_greater_than( $data{time_date} ) or $data{reminder} eq 'none' )
+      )
+    {
+        my @reminders = split( /,/, $data{reminder} );
+        for my $reminder_info (@reminders) {
+            my ( $reminder_time, $reminder_code ) =
+              $reminder_info =~ /^(\d+)(\S)/;
+            if ($reminder_time) {
+                my $reminder_diff  = '00:00';
+                my $reminder_units = 'minute';
+                $reminder_code = 'm' unless $reminder_code;
+                if ( $reminder_code eq 'd' ) {
+                    $reminder_diff  = ( 24 * $reminder_time ) . ':00';
+                    $reminder_units = 'day';
+                }
+                elsif ( $reminder_code eq 'h' ) {
+                    $reminder_diff  = "$reminder_time" . ':00';
+                    $reminder_units = 'hour';
+                }
+                elsif ( $reminder_time > 0 ) {
+                    if ( $reminder_time >= 60 ) {
+                        my $hours   = $reminder_time / 60;
+                        my $minutes = $reminder_time % 60;
+                        $reminder_diff = "$hours:"
+                          . ( ( $minutes >= 10 ) ? $minutes : "0$minutes" );
+                    }
+                    else {
+                        $reminder_diff = '00:'
+                          . (
+                            ( $reminder_time >= 10 )
+                            ? $reminder_time
+                            : "0$reminder_time"
+                          );
+                    }
+                }
+                $data{reminder_diff}  = $reminder_diff;
+                $data{reminder_time}  = $reminder_time;
+                $data{reminder_units} = $reminder_units;
+                print $fh
+                  "   if (time_now '$data{time_date} - $reminder_diff ') {"
+                  . &get_speak_code(%data) . "};\n";
+            }
+        }
+    }
+    if ( $data{type} =~ /task/i ) {
+        if ( ($speak_tasks) and ( $data{speak} =~ /^y/i ) ) {
+            if ( $data{time} and ( $data{time} !~ /12:00 am/i ) ) {
+                print MYCODE "   if (time_now '$data{date} $data{time}') {"
+                  . &get_speak_code(%data) . "};\n";
+            }
+            else {
+                foreach my $announce_time (@_organizer_announce_day_times) {
+                    print MYCODE
+                      "   if (time_now '$data{date}  $announce_time') {"
+                      . &get_speak_code(%data) . "};\n";
+                }
+            }
+        }
+
+        #Changed to notify all organizer addresses
+        if ( $data{name_count} ) {
+            my $textmsg = &get_textmsg_code(%data);
+            print MYCODE "   if (time_now '$data{date} 12 am') { $textmsg };\n";
+        }
+
+    }
+    else {
+        if ( $data{allday} !~ /^y/i ) {
+            $data{reminder_diff} = 0
+              ; # reset so that the get_speak_code doesn't think that this is an advance alarm
+            print $fh "   if (time_now '$data{time_date}') {"
+              . &get_speak_code(%data) . "};\n";
+        }
+        else {
+            $data{reminder_diff}  = 0;
+            $data{reminder_units} = 'day';
+            my $alert_date = &get_offset_date(%data);
+            foreach my $announce_time (@_organizer_announce_day_times) {
+                print MYCODE "   if (time_now '$alert_date  $announce_time') {"
+                  . &get_speak_code(%data) . "};\n"
+                  if $announce_time;
+            }
+            $data{reminder_diff} = 1;
+            my $alert_date = &get_offset_date(%data);
+            foreach my $announce_time (@_organizer_announce_priorday_times) {
+                print MYCODE "   if (time_now '$alert_date  $announce_time') {"
+                  . &get_speak_code(%data) . "};\n"
+                  if $announce_time;
+            }
+
+            # need to make the following adjustable
+            if (
+                $data{name}
+                && (   $data{description} =~ /birthday$/i
+                    or $data{description} =~ /anniversary$/i )
+              )
+            {
+                $data{reminder_diff} = 5;
+                $alert_date = &get_offset_date(%data);
+
+                #Changed to notify all organizer addresses
+                print $fh "   if (time_now '$alert_date 12 am') {"
+                  . &get_textmsg_code(%data) . "};\n";
+            }
+        }
+    }
+
+}
+
+sub get_offset_date {
+    my (%data) = @_;
+    my $hoursoffset =
+      $data{reminder_diff} * ( ( $data{reminder_units} = 'day' ) ? 24 : 1 );
+    my @date =
+      localtime( &main::my_str2time("$data{time_date} - $hoursoffset:00") );
+    my $month = $date[4] + 1;
+    my $year  = $date[5] + 1900;
+    my $offset_date =
+      ( $config_parms{date_format} =~ /ddmm/ )
+      ? "$date[3]/$month/$year"
+      : "$month/$date[3]/$year";
+    return $offset_date;
+}
+
+sub update_vsdb {
+
+    my ( $dbType, $dbPath, @schemaNames ) = @_;
+    return 0 unless $dbType and $dbPath and @schemaNames;
+
+    # targetFields will hold the fieldNames to be appended
+    my @targetFields = ();
+    my $vsdb;
+
+    if ( !-e $dbPath ) {
+        &main::print_log(
+            "Organizer (WARNING): $dbPath does not exist.  Now creating.");
+        push( @targetFields, 'ID' )
+          ;    # add the ID field in as it is not included in the schema names
+        push( @targetFields, @schemaNames );    # order doesn't matter after ID
+        $vsdb = new vsDB( file => $dbPath );
+        $vsdb->Open();
+    }
+    else {
+        my $ID_found = 0;
+        $vsdb = new vsDB( file => $dbPath );
+        $vsdb->Open();
+        foreach my $field ( $vsdb->FieldNames ) {
+            $ID_found = 1 if $field eq 'ID';
+            my @tmpFields = ();
+            foreach my $targetField (@schemaNames) {
+                push( @tmpFields, $targetField ) unless $targetField eq $field;
+            }
+            @schemaNames = @tmpFields;
+        }
+        if ( !($ID_found) ) {
+            &main::print_log(
+                "Organizer (WARNING): ID field not present in $dbPath.  Aborting continued use of $dbType."
+            );
+            $vsdb->Close();
+            return 0;
+        }
+        push( @targetFields, @schemaNames ) if @schemaNames;
+    }
+
+    if (@targetFields) {
+        &main::print_log("Organizer: Now upgrading $dbType database");
+        foreach my $targetField (@targetFields) {
+            &main::print_log(
+                "Organizer: adding $targetField to the $dbType database");
+            $vsdb->AddNewField($targetField);
+        }
+        $vsdb->Commit();
+        if ( $vsdb->LastError ) {
+            &main::print_log( "Organizer (ERROR): " . $vsdb->LastError );
+            return 0;
+        }
+    }
+    else {
+        &main::print_log(
+            "Organizer: $dbType matches target schema and does not require upgrading"
+        );
+    }
+    $vsdb->Close();
+    return 1;
+}
+
+sub write_i2v {
+
+    my ($data) = @_;
+    my $filename = "$config_parms{organizer_dir}/i2v.cfg";
+    print_log "Organizer: Saving autogenerated i2v configuration file...";
+
+    open( FILE, ">$filename" )
+      || print_log "Organizer.pl Error: Cannot write i2v.cfg file $filename!";
+    print FILE $data;
+    close(FILE);
+
+}
+   $Benchmark_Members{'organizer'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of organizer#-------------------------------------------------
+
+sub tk_eye_loopcode {
+ print '   tk_eye' if $Debug{user_code};
+   if ($Run_Members{'tk_eye'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in tk_eye.  Code was disabled', 0);        $Run_Members{'tk_eye'} = 0; return;
+ }   elsif ($Run_Members{'tk_eye'} > 2 and $Run_Members{'tk_eye'} != $Run_Members_Error_Count{'tk_eye'} )  {
+        display($Run_Members{'tk_eye'}.' eval errors in tk_eye out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'tk_eye'} = $Run_Members{'tk_eye'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = MisterHouse
+
+$Category = 'MisterHouse';
+
+#@ Adds a 'program active eye' to the tk interface
+
+
+if ($eye_dir) {
+    $eye_dir = 0 if ++$eye_pos > 65;
+}
+else {
+    $eye_dir = 1 if --$eye_pos == 0;
+}
+
+if ($MW) {
+
+    # I get "couldn't recognize data in image file" errors with .jpg files.  .gifs should be faster anyway
+    #   $Tk_objects{eye_photo}->configure(-file => "$Pgm_Path/images/eye/eye" . ($eye_pos + 1) . ".jpg");
+    $Tk_objects{eye_photo}->configure(
+        -file => "$Pgm_Path/images/eye/eye" . ( $eye_pos + 1 ) . ".gif" );
+
+    #$Tk_objects{eye} = '      ';
+    #substr($Tk_objects{eye}, $eye_pos, 1) = '=';
+}
+
+# *** Configurable for old style (different threshold for textbox movement)
+# *** Bind to click -> goes to mh Web site
+
+   $Benchmark_Members{'tk_eye'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of tk_eye#-------------------------------------------------
+
+sub my_test_loopcode {
+ print '   my_test' if $Debug{user_code};
+   if ($Run_Members{'my_test'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in my_test.  Code was disabled', 0);        $Run_Members{'my_test'} = 0; return;
+ }   elsif ($Run_Members{'my_test'} > 2 and $Run_Members{'my_test'} != $Run_Members_Error_Count{'my_test'} )  {
+        display($Run_Members{'my_test'}.' eval errors in my_test out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'my_test'} = $Run_Members{'my_test'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category = Test
+
+$Category = 'Test';
+
+#@ A simple voice command test.
+#@ Try changing editing this file then 'Reload Code' to test
+
+
+if ( $state = said $my_test1) {
+    if ( $state == 1 ) {
+        speak "You ran test 1 at $Time_Now";
+    }
+    elsif ( $state == 2 ) {
+        display "You ran test 2 on $Date_Now";
+    }
+    elsif ( $state == 3 ) {
+        print_log "Test 3 to the print log";
+    }
+}
+   $Benchmark_Members{'my_test'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of my_test#-------------------------------------------------
+
+sub organizer_events_loopcode {
+ print '   organizer_events' if $Debug{user_code};
+   if ($Run_Members{'organizer_events'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in organizer_events.  Code was disabled', 0);        $Run_Members{'organizer_events'} = 0; return;
+ }   elsif ($Run_Members{'organizer_events'} > 2 and $Run_Members{'organizer_events'} != $Run_Members_Error_Count{'organizer_events'} )  {
+        display($Run_Members{'organizer_events'}.' eval errors in organizer_events out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'organizer_events'} = $Run_Members{'organizer_events'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+
+# Category = Time
+
+$Category = 'Time';
+
+#@ Auto-generated from Organizer
+
+if ($New_Minute) {
+   if (time_now '10/2/2001  8 am') {speak ('app=organizer Calendar notice.  Today: Test Event.'); display ('app=organizer Calendar notice.  Today: Test Event.');};
+   if (time_now '10/2/2001  12 pm') {speak ('app=organizer Calendar notice.  Today: Test Event.'); display ('app=organizer Calendar notice.  Today: Test Event.');};
+   if (time_now '10/2/2001  7 pm') {speak ('app=organizer Calendar notice.  Today: Test Event.'); display ('app=organizer Calendar notice.  Today: Test Event.');};
+   if (time_now '10/1/2001  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: Test Event.'); display ('app=organizer Calendar notice.  Tomorrow: Test Event.');};
+   if (time_now '3/16/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/16/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/16/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/15/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test.'); display ('app=organizer Calendar notice.  Tomorrow: test.');};
+   if (time_now '3/19/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/19/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/19/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/18/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test.'); display ('app=organizer Calendar notice.  Tomorrow: test.');};
+   if (time_now '3/29/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/29/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/29/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '3/28/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test.'); display ('app=organizer Calendar notice.  Tomorrow: test.');};
+   if (time_now '3/29/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test 2.'); display ('app=organizer Calendar notice.  Today: test 2.');};
+   if (time_now '3/29/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test 2.'); display ('app=organizer Calendar notice.  Today: test 2.');};
+   if (time_now '3/29/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test 2.'); display ('app=organizer Calendar notice.  Today: test 2.');};
+   if (time_now '3/28/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test 2.'); display ('app=organizer Calendar notice.  Tomorrow: test 2.');};
+   if (time_now '4/20/2002  8 am') {speak ('app=organizer Calendar notice.  Today: Look at the stars.'); display ('app=organizer Calendar notice.  Today: Look at the stars.');};
+   if (time_now '4/20/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: Look at the stars.'); display ('app=organizer Calendar notice.  Today: Look at the stars.');};
+   if (time_now '4/20/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: Look at the stars.'); display ('app=organizer Calendar notice.  Today: Look at the stars.');};
+   if (time_now '4/19/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: Look at the stars.'); display ('app=organizer Calendar notice.  Tomorrow: Look at the stars.');};
+   if (time_now '5/6/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test it\'s now "time".'); display ('app=organizer Calendar notice.  Today: test it\'s now "time".');};
+   if (time_now '5/6/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test it\'s now "time".'); display ('app=organizer Calendar notice.  Today: test it\'s now "time".');};
+   if (time_now '5/6/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test it\'s now "time".'); display ('app=organizer Calendar notice.  Today: test it\'s now "time".');};
+   if (time_now '5/5/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test it\'s now "time".'); display ('app=organizer Calendar notice.  Tomorrow: test it\'s now "time".');};
+   if (time_now '5/6/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test hi there.'); display ('app=organizer Calendar notice.  Today: test hi there.');};
+   if (time_now '5/6/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test hi there.'); display ('app=organizer Calendar notice.  Today: test hi there.');};
+   if (time_now '5/6/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test hi there.'); display ('app=organizer Calendar notice.  Today: test hi there.');};
+   if (time_now '5/5/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test hi there.'); display ('app=organizer Calendar notice.  Tomorrow: test hi there.');};
+   if (time_now '6/2/2002  8 am') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/2/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/2/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/1/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: David\'s Open House.'); display ('app=organizer Calendar notice.  Tomorrow: David\'s Open House.');};
+   if (time_now '6/2/2002  8 am') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/2/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/2/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/1/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: David\'s Open House.'); display ('app=organizer Calendar notice.  Tomorrow: David\'s Open House.');};
+   if (time_now '6/2/2002  8 am') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/2/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/2/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: David\'s Open House.'); display ('app=organizer Calendar notice.  Today: David\'s Open House.');};
+   if (time_now '6/1/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: David\'s Open House.'); display ('app=organizer Calendar notice.  Tomorrow: David\'s Open House.');};
+   if (time_now '6/6/2002  8 am') {speak ('app=organizer Calendar notice.  Today: Pay Estimated Tax.'); display ('app=organizer Calendar notice.  Today: Pay Estimated Tax.');};
+   if (time_now '6/6/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: Pay Estimated Tax.'); display ('app=organizer Calendar notice.  Today: Pay Estimated Tax.');};
+   if (time_now '6/6/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: Pay Estimated Tax.'); display ('app=organizer Calendar notice.  Today: Pay Estimated Tax.');};
+   if (time_now '6/5/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: Pay Estimated Tax.'); display ('app=organizer Calendar notice.  Tomorrow: Pay Estimated Tax.');};
+   if (time_now '6/4/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '6/4/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '6/4/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test.'); display ('app=organizer Calendar notice.  Today: test.');};
+   if (time_now '6/3/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test.'); display ('app=organizer Calendar notice.  Tomorrow: test.');};
+   if (time_now '6/8/2002  8 am') {speak ('app=organizer Calendar notice.  Today: Seep in.'); display ('app=organizer Calendar notice.  Today: Seep in.');};
+   if (time_now '6/8/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: Seep in.'); display ('app=organizer Calendar notice.  Today: Seep in.');};
+   if (time_now '6/8/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: Seep in.'); display ('app=organizer Calendar notice.  Today: Seep in.');};
+   if (time_now '6/7/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: Seep in.'); display ('app=organizer Calendar notice.  Tomorrow: Seep in.');};
+   if (time_now '6/6/2002  8 am') {speak ('app=organizer Calendar notice.  Today: Mow the lawn.'); display ('app=organizer Calendar notice.  Today: Mow the lawn.');};
+   if (time_now '6/6/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: Mow the lawn.'); display ('app=organizer Calendar notice.  Today: Mow the lawn.');};
+   if (time_now '6/6/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: Mow the lawn.'); display ('app=organizer Calendar notice.  Today: Mow the lawn.');};
+   if (time_now '6/5/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: Mow the lawn.'); display ('app=organizer Calendar notice.  Tomorrow: Mow the lawn.');};
+   if (time_now '6/30/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test again.'); display ('app=organizer Calendar notice.  Today: test again.');};
+   if (time_now '6/30/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test again.'); display ('app=organizer Calendar notice.  Today: test again.');};
+   if (time_now '6/30/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test again.'); display ('app=organizer Calendar notice.  Today: test again.');};
+   if (time_now '6/29/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test again.'); display ('app=organizer Calendar notice.  Tomorrow: test again.');};
+   if (time_now '10/12/2002  8 am') {speak ('app=organizer Calendar notice.  Today: .'); display ('app=organizer Calendar notice.  Today: .');};
+   if (time_now '10/12/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: .'); display ('app=organizer Calendar notice.  Today: .');};
+   if (time_now '10/12/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: .'); display ('app=organizer Calendar notice.  Today: .');};
+   if (time_now '10/11/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: .'); display ('app=organizer Calendar notice.  Tomorrow: .');};
+   if (time_now '10/12/2002  8 am') {speak ('app=organizer Calendar notice.  Today: test2.'); display ('app=organizer Calendar notice.  Today: test2.');};
+   if (time_now '10/12/2002  12 pm') {speak ('app=organizer Calendar notice.  Today: test2.'); display ('app=organizer Calendar notice.  Today: test2.');};
+   if (time_now '10/12/2002  7 pm') {speak ('app=organizer Calendar notice.  Today: test2.'); display ('app=organizer Calendar notice.  Today: test2.');};
+   if (time_now '10/11/2002  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: test2.'); display ('app=organizer Calendar notice.  Tomorrow: test2.');};
+   if (time_now '1/18/2005  8 am') {speak ('app=organizer Calendar notice.  Today: Chris radio show.'); display ('app=organizer Calendar notice.  Today: Chris radio show.');};
+   if (time_now '1/18/2005  12 pm') {speak ('app=organizer Calendar notice.  Today: Chris radio show.'); display ('app=organizer Calendar notice.  Today: Chris radio show.');};
+   if (time_now '1/18/2005  7 pm') {speak ('app=organizer Calendar notice.  Today: Chris radio show.'); display ('app=organizer Calendar notice.  Today: Chris radio show.');};
+   if (time_now '1/17/2005  7 pm') {speak ('app=organizer Calendar notice.  Tomorrow: Chris radio show.'); display ('app=organizer Calendar notice.  Tomorrow: Chris radio show.');};
+}
+   $Benchmark_Members{'organizer_events'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of organizer_events#-------------------------------------------------
+
+sub organizer_tasks_loopcode {
+ print '   organizer_tasks' if $Debug{user_code};
+   if ($Run_Members{'organizer_tasks'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in organizer_tasks.  Code was disabled', 0);        $Run_Members{'organizer_tasks'} = 0; return;
+ }   elsif ($Run_Members{'organizer_tasks'} > 2 and $Run_Members{'organizer_tasks'} != $Run_Members_Error_Count{'organizer_tasks'} )  {
+        display($Run_Members{'organizer_tasks'}.' eval errors in organizer_tasks out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'organizer_tasks'} = $Run_Members{'organizer_tasks'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+
+# Category = Time
+
+$Category = 'Time';
+
+#@ Auto-generated from Organizer
+
+if ($New_Minute) {
+   if (time_now '8:01 pm  - 00:15 ') {speak ('app=organizer Task notice for bruce, test task.hi again'); display ('app=organizer Task notice for bruce, test task.hi again');};
+}
+   $Benchmark_Members{'organizer_tasks'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of organizer_tasks#-------------------------------------------------
+
+sub test_table_loopcode {
+ print '   test_table' if $Debug{user_code};
+   if ($Run_Members{'test_table'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in test_table.  Code was disabled', 0);        $Run_Members{'test_table'} = 0; return;
+ }   elsif ($Run_Members{'test_table'} > 2 and $Run_Members{'test_table'} != $Run_Members_Error_Count{'test_table'} )  {
+        display($Run_Members{'test_table'}.' eval errors in test_table out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'test_table'} = $Run_Members{'test_table'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+#
+#@ Do NOT edit this file.  It was auto-generated from test.mht.
+#
+# Category = Other
+
+$Category = 'Other';
+
+#
+#
+# Floorplaning info:
+#  - If you include x,y data, you can monitor and control these items
+#    with the web floorplan page:  http://localhost:8080/bin/floorplan.pl
+#  - For items, specify the x,y after the room group name:  room_group(x;y)
+#  - For room groups, specify x,y,width,height relative to its
+#    parent group:   Group, room_group, parent_group(x;y;w;h)
+#  - By default, floorplan.pl will use $Property as the top level group
+# Define Room groups for floorplan
+# Init results: 0
+
+
+
+
+#
+# Type    Address   Name                   Groups                                      Other Info
+#
+
+
+
+
+
+
+
+# VOICE entries default to [ON,OFF]
+
+if ($v_garage_light_state = said $v_garage_light) {
+  set $garage_light $v_garage_light_state;
+  respond "Turning garage light $v_garage_light_state";
+}
+
+if ($v_fountain_state = said $v_fountain) {
+  set $fountain $v_fountain_state;
+  respond "Turning fountain $v_fountain_state";
+}
+# Here are some examples of adding multiple states to the same item
+
+
+
+
+
+# Here are some examples of specifying interface and module types
+# If your want to use a non-default X10 interface, specify with the 1st 'other info' field
+# If your X10 module support preset dim,      specify preset in the 2nd 'other info' field
+#X10A,       O9,     living_room_fan,       Appliances|Upstairs|LivingRoom(10;10),  CM17
+#X10I,       O7,     camera_light2,         All_Lights|Upstairs|LivingRoom(5;10),   CM11
+#X10I,       O7,     camera_light,          All_Lights|Upstairs|LivingRoom(10;5),        , LM14
+#X10I,       O7,     camera_light,          All_Lights|Upstairs|LivingRoom(10;5),        , preset
+# Here are X10_Sensor examples for detecting motion and brightness
+#
+#X10MS,      CA,    work_room_motion,       Sensors|Motion_Sensors,      Motion
+#X10MS,      CB,    work_room_brightness,   Sensors|Brighness_Sensors,   Brightness
+#X10MS,      CA,    work_room_sensors,      Sensors,      		MS13    # This detects both motion and brightness
+   $Benchmark_Members{'test_table'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of test_table#-------------------------------------------------
+
+sub test_x10_loopcode {
+ print '   test_x10' if $Debug{user_code};
+   if ($Run_Members{'test_x10'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in test_x10.  Code was disabled', 0);        $Run_Members{'test_x10'} = 0; return;
+ }   elsif ($Run_Members{'test_x10'} > 2 and $Run_Members{'test_x10'} != $Run_Members_Error_Count{'test_x10'} )  {
+        display($Run_Members{'test_x10'}.' eval errors in test_x10 out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'test_x10'} = $Run_Members{'test_x10'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+# Category=Test
+
+$Category = 'Test';
+
+#@ This has simple examples for controling and monitoring X10 data.
+
+
+#
+#  Note: X10 items are now defined in test_x10.mht
+#
+#$test_light1 = new X10_Item('A1');
+#$test_light2 = new X10_Item('B1');
+#$test_appliance = new X10_Appliance('B2');
+
+# If you have more than one X10 interface, and want to choose which
+# one gets used to control a device, you can specify the
+# interface name as a second parameter, like this:
+#    $test_light_1 = new X10_Item('A1', 'CM11');
+#    $test_light_1 = new X10_Item('B1', 'CM17');
+
+
+#set $test_light2 $state if $state = said $v_test_light_2;
+tie_items $v_test_light2 $test_light2;
+
+set $All_Lights $state if $state = said $v_test_lights;
+
+# Toggle the light on/off every 30 seconds
+if ( $New_Second and !( $Second % 30 ) ) {
+    my $state = ( 'on' eq state $test_light1) ? 'off' : 'on';
+    set $test_light1 $state;
+    my $remark = "Light set to $state";
+    print_log "$remark";
+
+    #   speak $remark;
+}
+
+# Respond if the A2 button is pushed
+if ( state_now $test_button) {
+    my $remark = "You just pushed the A2 button";
+    print_log "$remark";
+    speak $remark;
+}
+   $Benchmark_Members{'test_x10'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of test_x10#-------------------------------------------------
+
+sub triggers_table_loopcode {
+ print '   triggers_table' if $Debug{user_code};
+   if ($Run_Members{'triggers_table'} > 10) { # Check for too many eval errors
+        display('Multiple eval errors in triggers_table.  Code was disabled', 0);        $Run_Members{'triggers_table'} = 0; return;
+ }   elsif ($Run_Members{'triggers_table'} > 2 and $Run_Members{'triggers_table'} != $Run_Members_Error_Count{'triggers_table'} )  {
+        display($Run_Members{'triggers_table'}.' eval errors in triggers_table out of 10 allowed before disable') }
+  $Run_Members_Error_Count{'triggers_table'} = $Run_Members{'triggers_table'};
+   my $benchmark_tickcount = &get_tickcount if $Benchmark_Members{on_off_flag};
+#
+# You shouldn't edit this file.  This file is auto-generated by
+# mh/lib/trigger_code.pl.
+# If there are syntax errors here, you should delete this file and edit
+# ./../data/triggers.current.  This file will be recreated
+# when Misterhouse is next started.
+#
+
+# name=get MH version type=NoExpire
+if ((time_cron '0 18 * * *' and net_connect_check) and &trigger_active('get MH version')) {
+    # FYI trigger code: run_voice_cmd 'Check Misterhouse version';
+    &trigger_run('get MH version',1);
+}
+
+# name=update the documentation type=NoExpire
+if ((time_cron('5 4 * * *')) and &trigger_active('update the documentation')) {
+    # FYI trigger code: run_voice_cmd 'Update the Documentation';
+    &trigger_run('update the documentation',1);
+}
+   $Benchmark_Members{'triggers_table'} += &get_tickcount - $benchmark_tickcount if $benchmark_tickcount and $Benchmark_Members{on_off_flag};
+
+} # End of triggers_table#-----------------------------------
+
+sub loop_code {
+
+   $loop_sleep_total = 0;
+   $loop_sleep_total += &sleep_time($Loop_Sleep_Time);
+    $Run_Members{'tk_frames'}++, tk_frames_loopcode, $Run_Members{'tk_frames'}-- if $Run_Members{'tk_frames'};
+    $Run_Members{'tk_widgets'}++, tk_widgets_loopcode, $Run_Members{'tk_widgets'}-- if $Run_Members{'tk_widgets'};
+    $Run_Members{'benchmarks'}++, benchmarks_loopcode, $Run_Members{'benchmarks'}-- if $Run_Members{'benchmarks'};
+    $Run_Members{'eliza_server'}++, eliza_server_loopcode, $Run_Members{'eliza_server'}-- if $Run_Members{'eliza_server'};
+   $loop_sleep_total += &sleep_time($Loop_Sleep_Time);
+    $Run_Members{'menu'}++, menu_loopcode, $Run_Members{'menu'}-- if $Run_Members{'menu'};
+    $Run_Members{'mh_control'}++, mh_control_loopcode, $Run_Members{'mh_control'}-- if $Run_Members{'mh_control'};
+    $Run_Members{'mh_release'}++, mh_release_loopcode, $Run_Members{'mh_release'}-- if $Run_Members{'mh_release'};
+    $Run_Members{'mh_sound'}++, mh_sound_loopcode, $Run_Members{'mh_sound'}-- if $Run_Members{'mh_sound'};
+   $loop_sleep_total += &sleep_time($Loop_Sleep_Time);
+    $Run_Members{'mhsend_server'}++, mhsend_server_loopcode, $Run_Members{'mhsend_server'}-- if $Run_Members{'mhsend_server'};
+    $Run_Members{'organizer'}++, organizer_loopcode, $Run_Members{'organizer'}-- if $Run_Members{'organizer'};
+    $Run_Members{'tk_eye'}++, tk_eye_loopcode, $Run_Members{'tk_eye'}-- if $Run_Members{'tk_eye'};
+    $Run_Members{'my_test'}++, my_test_loopcode, $Run_Members{'my_test'}-- if $Run_Members{'my_test'};
+   $loop_sleep_total += &sleep_time($Loop_Sleep_Time);
+    $Run_Members{'organizer_events'}++, organizer_events_loopcode, $Run_Members{'organizer_events'}-- if $Run_Members{'organizer_events'};
+    $Run_Members{'organizer_tasks'}++, organizer_tasks_loopcode, $Run_Members{'organizer_tasks'}-- if $Run_Members{'organizer_tasks'};
+    $Run_Members{'test_table'}++, test_table_loopcode, $Run_Members{'test_table'}-- if $Run_Members{'test_table'};
+    $Run_Members{'test_x10'}++, test_x10_loopcode, $Run_Members{'test_x10'}-- if $Run_Members{'test_x10'};
+    $Run_Members{'triggers_table'}++, triggers_table_loopcode, $Run_Members{'triggers_table'}-- if $Run_Members{'triggers_table'};
+   $loop_sleep_total += &sleep_time($Loop_Sleep_Time);
+
+}

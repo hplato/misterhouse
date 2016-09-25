@@ -46,7 +46,6 @@ require HTML::Element;
 
 use strict;
 use Carp;
-use UNIVERSAL qw(can);
 
 use vars qw($VERSION);
 ($VERSION) = q$Revision$ =~ /: (\d+)/;

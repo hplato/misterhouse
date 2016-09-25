@@ -309,8 +309,16 @@ sub main::get_tickcount {
 }
 
 sub main::logit {
-    my ( $log_file, $log_data, $log_format, $head_tail ) = @_;
-    $log_format = 14 unless defined $log_format;
+    my ( $log_file, $log_data, $log_time_format, $head_tail ) = @_;
+
+    my $log_format = 14;
+    if (defined $log_time_format){
+        $log_format = $log_time_format;
+    }
+    elsif (defined $::config_parms{time_format_log}){
+        $log_format = $::config_parms{time_format_log};
+    }
+
     unless ( $log_format == 0 ) {
         $log_data =~ s/[\n\r]+/ /g;    # So log only takes one line.
         my $time_date = &main::time_date_stamp($log_format);

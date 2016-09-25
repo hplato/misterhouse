@@ -1,0 +1,250 @@
+07/02/15 11:45:33 AM ---------- Restart ----------
+07/13/15 08:13:28 PM ---------- Restart ----------
+07/13/15 08:14:09 PM ---------- Restart ----------
+07/13/15 08:14:09 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/perl5/5.22.0/i686-linux, /usr/local/lib/perl5/5.22.0, /usr/lib/perl5/vendor_perl/5.22.0/i686-linux, /usr/lib/perl5/vendor_perl/5.22.0, /usr/local/lib/perl5/5.20.2, /usr/local/lib/perl5/5.20.1, /usr/local/lib/perl5/5.18.2, /usr/local/lib/perl5/5.16.3, /usr/local/lib/perl5, /usr/lib/perl5/vendor_perl/5.20.2, /usr/lib/perl5/vendor_perl/5.20.1, /usr/lib/perl5/vendor_perl/5.18.2, /usr/lib/perl5/vendor_perl/5.16.3, /usr/lib/perl5/vendor_perl, /usr/lib/perl5/5.22.0/i686-linux, /usr/lib/perl5/5.22.0, .
+07/13/15 08:14:09 PM Reading mh.private.ini and mh.ini
+07/13/15 08:14:09 PM Reading 1 .mht table files: test.mht
+07/13/15 08:14:09 PM Translating test.mht -> ./../code/test/test.mhp
+07/13/15 08:14:09 PM Initialized read_table_A.pl
+07/13/15 08:14:09 PM Reading 14 code files
+07/13/15 08:14:09 PM Evaluating user code
+07/13/15 08:14:09 PM running: play ./../sounds/sound_click1.wav
+
+07/13/15 08:14:09 PM Rereading .menu code files.
+07/13/15 08:14:09 PM Organizer: Calendar matches target schema and does not require upgrading
+07/13/15 08:14:09 PM Organizer: Todo matches target schema and does not require upgrading
+07/13/15 08:14:09 PM Organizer: Reading updated organizer calendar file now
+07/13/15 08:14:09 PM Evaluating code organizer_events
+07/13/15 08:14:09 PM Organizer: Reading updated organizer todo file
+07/13/15 08:14:09 PM Evaluating code organizer_tasks
+07/02/15 11:45:33 AM ---------- Restart ----------
+07/13/15 08:13:28 PM ---------- Restart ----------
+07/13/15 08:14:09 PM ---------- Restart ----------
+07/13/15 08:14:09 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/perl5/5.22.0/i686-linux, /usr/local/lib/perl5/5.22.0, /usr/lib/perl5/vendor_perl/5.22.0/i686-linux, /usr/lib/perl5/vendor_perl/5.22.0, /usr/local/lib/perl5/5.20.2, /usr/local/lib/perl5/5.20.1, /usr/local/lib/perl5/5.18.2, /usr/local/lib/perl5/5.16.3, /usr/local/lib/perl5, /usr/lib/perl5/vendor_perl/5.20.2, /usr/lib/perl5/vendor_perl/5.20.1, /usr/lib/perl5/vendor_perl/5.18.2, /usr/lib/perl5/vendor_perl/5.16.3, /usr/lib/perl5/vendor_perl, /usr/lib/perl5/5.22.0/i686-linux, /usr/lib/perl5/5.22.0, .
+07/13/15 08:14:09 PM Reading mh.private.ini and mh.ini
+07/13/15 08:14:09 PM Reading 1 .mht table files: test.mht
+07/13/15 08:14:09 PM Translating test.mht -> ./../code/test/test.mhp
+07/13/15 08:14:09 PM Initialized read_table_A.pl
+07/13/15 08:14:09 PM Reading 14 code files
+07/13/15 08:14:09 PM Evaluating user code
+07/13/15 08:14:09 PM running: play ./../sounds/sound_click1.wav
+
+07/13/15 08:14:09 PM Rereading .menu code files.
+07/13/15 08:14:09 PM Organizer: Calendar matches target schema and does not require upgrading
+07/13/15 08:14:09 PM Organizer: Todo matches target schema and does not require upgrading
+07/13/15 08:14:09 PM Organizer: Reading updated organizer calendar file now
+07/13/15 08:14:09 PM Evaluating code organizer_events
+07/13/15 08:14:09 PM Organizer: Reading updated organizer todo file
+07/13/15 08:14:09 PM Evaluating code organizer_tasks
+09/27/15 03:44:00 PM ---------- Restart ----------
+09/27/15 03:44:00 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+09/27/15 03:44:00 PM Reading /home/tob/mh-private/mh.private.ini and mh.ini
+09/27/15 03:44:00 PM Reading 1 .mht table files: test.mht
+09/27/15 03:44:00 PM Translating test.mht -> ./../code/test/test.mhp
+09/27/15 03:44:00 PM Initialized read_table_A.pl
+09/27/15 03:44:00 PM Reading 14 code files
+09/27/15 03:44:00 PM Evaluating user code
+09/27/15 03:44:00 PM running: play ./../sounds/sound_click1.wav
+
+09/27/15 03:44:00 PM Rereading .menu code files.
+09/27/15 03:44:00 PM Organizer: Calendar matches target schema and does not require upgrading
+09/27/15 03:44:00 PM Organizer: Todo matches target schema and does not require upgrading
+09/27/15 03:44:00 PM Organizer: Reading updated organizer calendar file now
+09/27/15 03:44:00 PM Evaluating code organizer_events
+09/27/15 03:44:00 PM Organizer: Reading updated organizer todo file
+09/27/15 03:44:00 PM Evaluating code organizer_tasks
+07/02/15 11:45:33 AM ---------- Restart ----------
+07/13/15 08:13:28 PM ---------- Restart ----------
+07/13/15 08:14:09 PM ---------- Restart ----------
+07/13/15 08:14:09 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/perl5/5.22.0/i686-linux, /usr/local/lib/perl5/5.22.0, /usr/lib/perl5/vendor_perl/5.22.0/i686-linux, /usr/lib/perl5/vendor_perl/5.22.0, /usr/local/lib/perl5/5.20.2, /usr/local/lib/perl5/5.20.1, /usr/local/lib/perl5/5.18.2, /usr/local/lib/perl5/5.16.3, /usr/local/lib/perl5, /usr/lib/perl5/vendor_perl/5.20.2, /usr/lib/perl5/vendor_perl/5.20.1, /usr/lib/perl5/vendor_perl/5.18.2, /usr/lib/perl5/vendor_perl/5.16.3, /usr/lib/perl5/vendor_perl, /usr/lib/perl5/5.22.0/i686-linux, /usr/lib/perl5/5.22.0, .
+07/13/15 08:14:09 PM Reading mh.private.ini and mh.ini
+07/13/15 08:14:09 PM Reading 1 .mht table files: test.mht
+07/13/15 08:14:09 PM Translating test.mht -> ./../code/test/test.mhp
+07/13/15 08:14:09 PM Initialized read_table_A.pl
+07/13/15 08:14:09 PM Reading 14 code files
+07/13/15 08:14:09 PM Evaluating user code
+07/13/15 08:14:09 PM running: play ./../sounds/sound_click1.wav
+
+07/13/15 08:14:09 PM Rereading .menu code files.
+07/13/15 08:14:09 PM Organizer: Calendar matches target schema and does not require upgrading
+07/13/15 08:14:09 PM Organizer: Todo matches target schema and does not require upgrading
+07/13/15 08:14:09 PM Organizer: Reading updated organizer calendar file now
+07/13/15 08:14:09 PM Evaluating code organizer_events
+07/13/15 08:14:09 PM Organizer: Reading updated organizer todo file
+07/13/15 08:14:09 PM Evaluating code organizer_tasks
+09/27/15 03:44:00 PM ---------- Restart ----------
+09/27/15 03:44:00 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+09/27/15 03:44:00 PM Reading /home/tob/mh-private/mh.private.ini and mh.ini
+09/27/15 03:44:00 PM Reading 1 .mht table files: test.mht
+09/27/15 03:44:00 PM Translating test.mht -> ./../code/test/test.mhp
+09/27/15 03:44:00 PM Initialized read_table_A.pl
+09/27/15 03:44:00 PM Reading 14 code files
+09/27/15 03:44:00 PM Evaluating user code
+09/27/15 03:44:00 PM running: play ./../sounds/sound_click1.wav
+
+09/27/15 03:44:00 PM Rereading .menu code files.
+09/27/15 03:44:00 PM Organizer: Calendar matches target schema and does not require upgrading
+09/27/15 03:44:00 PM Organizer: Todo matches target schema and does not require upgrading
+09/27/15 03:44:00 PM Organizer: Reading updated organizer calendar file now
+09/27/15 03:44:00 PM Evaluating code organizer_events
+09/27/15 03:44:00 PM Organizer: Reading updated organizer todo file
+09/27/15 03:44:00 PM Evaluating code organizer_tasks
+10/12/15 06:05:26 PM ---------- Restart ----------
+10/12/15 06:05:26 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+10/12/15 06:05:26 PM Reading mh.private.ini and mh.ini
+10/12/15 06:05:26 PM Reading 1 .mht table files: test.mht
+10/12/15 06:05:26 PM Translating test.mht -> ./../code/test/test.mhp
+10/12/15 06:05:26 PM Initialized read_table_A.pl
+10/12/15 06:05:26 PM Reading 17 code files
+10/12/15 06:05:26 PM Evaluating user code
+10/12/15 06:05:26 PM running: play ./../sounds/sound_click1.wav
+
+10/12/15 06:05:26 PM Reading mh.private.ini and mh.ini
+10/12/15 06:05:26 PM Reading 1 .mht table files: test.mht
+10/12/15 06:05:26 PM Reading 17 code files
+10/12/15 06:05:26 PM Rereading .menu code files.
+10/12/15 06:05:26 PM Organizer: Calendar matches target schema and does not require upgrading
+10/12/15 06:05:26 PM Organizer: Todo matches target schema and does not require upgrading
+10/12/15 06:05:26 PM Organizer: Reading updated organizer calendar file now
+10/12/15 06:05:26 PM Evaluating code organizer_events
+10/12/15 06:05:26 PM Organizer: Reading updated organizer todo file
+10/12/15 06:05:26 PM Evaluating code organizer_tasks
+10/12/15 06:05:30 PM Light set to on
+07/13/15 08:14:09 PM Initialized read_table_A.pl
+07/13/15 08:14:09 PM Reading 14 code files
+07/13/15 08:14:09 PM Evaluating user code
+07/13/15 08:14:09 PM running: play ./../sounds/sound_click1.wav
+
+07/13/15 08:14:09 PM Rereading .menu code files.
+07/13/15 08:14:09 PM Organizer: Calendar matches target schema and does not require upgrading
+07/13/15 08:14:09 PM Organizer: Todo matches target schema and does not require upgrading
+07/13/15 08:14:09 PM Organizer: Reading updated organizer calendar file now
+07/13/15 08:14:09 PM Evaluating code organizer_events
+07/13/15 08:14:09 PM Organizer: Reading updated organizer todo file
+07/13/15 08:14:09 PM Evaluating code organizer_tasks
+09/27/15 03:44:00 PM ---------- Restart ----------
+09/27/15 03:44:00 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+09/27/15 03:44:00 PM Reading /home/tob/mh-private/mh.private.ini and mh.ini
+09/27/15 03:44:00 PM Reading 1 .mht table files: test.mht
+09/27/15 03:44:00 PM Translating test.mht -> ./../code/test/test.mhp
+09/27/15 03:44:00 PM Initialized read_table_A.pl
+09/27/15 03:44:00 PM Reading 14 code files
+09/27/15 03:44:00 PM Evaluating user code
+09/27/15 03:44:00 PM running: play ./../sounds/sound_click1.wav
+
+09/27/15 03:44:00 PM Rereading .menu code files.
+09/27/15 03:44:00 PM Organizer: Calendar matches target schema and does not require upgrading
+09/27/15 03:44:00 PM Organizer: Todo matches target schema and does not require upgrading
+09/27/15 03:44:00 PM Organizer: Reading updated organizer calendar file now
+09/27/15 03:44:00 PM Evaluating code organizer_events
+09/27/15 03:44:00 PM Organizer: Reading updated organizer todo file
+09/27/15 03:44:00 PM Evaluating code organizer_tasks
+10/12/15 06:05:26 PM ---------- Restart ----------
+10/12/15 06:05:26 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+10/12/15 06:05:26 PM Reading mh.private.ini and mh.ini
+10/12/15 06:05:26 PM Reading 1 .mht table files: test.mht
+10/12/15 06:05:26 PM Translating test.mht -> ./../code/test/test.mhp
+10/12/15 06:05:26 PM Initialized read_table_A.pl
+10/12/15 06:05:26 PM Reading 17 code files
+10/12/15 06:05:26 PM Evaluating user code
+10/12/15 06:05:26 PM running: play ./../sounds/sound_click1.wav
+
+10/12/15 06:05:26 PM Reading mh.private.ini and mh.ini
+10/12/15 06:05:26 PM Reading 1 .mht table files: test.mht
+10/12/15 06:05:26 PM Reading 17 code files
+10/12/15 06:05:26 PM Rereading .menu code files.
+10/12/15 06:05:26 PM Organizer: Calendar matches target schema and does not require upgrading
+10/12/15 06:05:26 PM Organizer: Todo matches target schema and does not require upgrading
+10/12/15 06:05:26 PM Organizer: Reading updated organizer calendar file now
+10/12/15 06:05:26 PM Evaluating code organizer_events
+10/12/15 06:05:26 PM Organizer: Reading updated organizer todo file
+10/12/15 06:05:26 PM Evaluating code organizer_tasks
+10/12/15 06:05:30 PM Light set to on
+10/12/15 06:06:33 PM ---------- Restart ----------
+10/12/15 06:06:33 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+10/12/15 06:06:33 PM Reading /home/tob/mh-private/mh.private.ini and mh.ini
+10/12/15 06:06:33 PM Reading 1 .mht table files: test.mht
+10/12/15 06:06:33 PM Translating test.mht -> ./../code/test/test.mhp
+10/12/15 06:06:33 PM Initialized read_table_A.pl
+10/12/15 06:06:33 PM Reading 17 code files
+10/12/15 06:06:33 PM Evaluating user code
+10/12/15 06:06:33 PM running: play ./../sounds/sound_click1.wav
+
+10/12/15 06:06:33 PM Rereading .menu code files.
+10/12/15 06:06:33 PM Organizer: Calendar matches target schema and does not require upgrading
+10/12/15 06:06:33 PM Organizer: Todo matches target schema and does not require upgrading
+10/12/15 06:06:33 PM Organizer: Reading updated organizer calendar file now
+10/12/15 06:06:33 PM Evaluating code organizer_events
+10/12/15 06:06:33 PM Organizer: Reading updated organizer todo file
+10/12/15 06:06:33 PM Evaluating code organizer_tasks
+09/27/15 03:44:00 PM Initialized read_table_A.pl
+09/27/15 03:44:00 PM Reading 14 code files
+09/27/15 03:44:00 PM Evaluating user code
+09/27/15 03:44:00 PM running: play ./../sounds/sound_click1.wav
+
+09/27/15 03:44:00 PM Rereading .menu code files.
+09/27/15 03:44:00 PM Organizer: Calendar matches target schema and does not require upgrading
+09/27/15 03:44:00 PM Organizer: Todo matches target schema and does not require upgrading
+09/27/15 03:44:00 PM Organizer: Reading updated organizer calendar file now
+09/27/15 03:44:00 PM Evaluating code organizer_events
+09/27/15 03:44:00 PM Organizer: Reading updated organizer todo file
+09/27/15 03:44:00 PM Evaluating code organizer_tasks
+10/12/15 06:05:26 PM ---------- Restart ----------
+10/12/15 06:05:26 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+10/12/15 06:05:26 PM Reading mh.private.ini and mh.ini
+10/12/15 06:05:26 PM Reading 1 .mht table files: test.mht
+10/12/15 06:05:26 PM Translating test.mht -> ./../code/test/test.mhp
+10/12/15 06:05:26 PM Initialized read_table_A.pl
+10/12/15 06:05:26 PM Reading 17 code files
+10/12/15 06:05:26 PM Evaluating user code
+10/12/15 06:05:26 PM running: play ./../sounds/sound_click1.wav
+
+10/12/15 06:05:26 PM Reading mh.private.ini and mh.ini
+10/12/15 06:05:26 PM Reading 1 .mht table files: test.mht
+10/12/15 06:05:26 PM Reading 17 code files
+10/12/15 06:05:26 PM Rereading .menu code files.
+10/12/15 06:05:26 PM Organizer: Calendar matches target schema and does not require upgrading
+10/12/15 06:05:26 PM Organizer: Todo matches target schema and does not require upgrading
+10/12/15 06:05:26 PM Organizer: Reading updated organizer calendar file now
+10/12/15 06:05:26 PM Evaluating code organizer_events
+10/12/15 06:05:26 PM Organizer: Reading updated organizer todo file
+10/12/15 06:05:26 PM Evaluating code organizer_tasks
+10/12/15 06:05:30 PM Light set to on
+10/12/15 06:06:33 PM ---------- Restart ----------
+10/12/15 06:06:33 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+10/12/15 06:06:33 PM Reading /home/tob/mh-private/mh.private.ini and mh.ini
+10/12/15 06:06:33 PM Reading 1 .mht table files: test.mht
+10/12/15 06:06:33 PM Translating test.mht -> ./../code/test/test.mhp
+10/12/15 06:06:33 PM Initialized read_table_A.pl
+10/12/15 06:06:33 PM Reading 17 code files
+10/12/15 06:06:33 PM Evaluating user code
+10/12/15 06:06:33 PM running: play ./../sounds/sound_click1.wav
+
+10/12/15 06:06:33 PM Rereading .menu code files.
+10/12/15 06:06:33 PM Organizer: Calendar matches target schema and does not require upgrading
+10/12/15 06:06:33 PM Organizer: Todo matches target schema and does not require upgrading
+10/12/15 06:06:33 PM Organizer: Reading updated organizer calendar file now
+10/12/15 06:06:33 PM Evaluating code organizer_events
+10/12/15 06:06:33 PM Organizer: Reading updated organizer todo file
+10/12/15 06:06:33 PM Evaluating code organizer_tasks
+10/12/15 06:07:19 PM ---------- Restart ----------
+10/12/15 06:07:19 PM Perl @INC contains: ./../code/test, ./../code/common, ./../lib, ./../lib/site, ., /etc/perl, /usr/local/lib/x86_64-linux-gnu/perl/5.20.2, /usr/local/share/perl/5.20.2, /usr/lib/x86_64-linux-gnu/perl5/5.20, /usr/share/perl5, /usr/lib/x86_64-linux-gnu/perl/5.20, /usr/share/perl/5.20, /usr/local/lib/site_perl, .
+10/12/15 06:07:19 PM Reading /home/tob/mh-private/mh.private.ini and mh.ini
+10/12/15 06:07:19 PM Reading 1 .mht table files: test.mht
+10/12/15 06:07:19 PM Translating test.mht -> ./../code/test/test.mhp
+10/12/15 06:07:19 PM Initialized read_table_A.pl
+10/12/15 06:07:19 PM Reading 17 code files
+10/12/15 06:07:19 PM Evaluating user code
+10/12/15 06:07:19 PM running: play ./../sounds/sound_click1.wav
+
+10/12/15 06:07:19 PM Rereading .menu code files.
+10/12/15 06:07:19 PM Organizer: Calendar matches target schema and does not require upgrading
+10/12/15 06:07:19 PM Organizer: Todo matches target schema and does not require upgrading
+10/12/15 06:07:19 PM Organizer: Reading updated organizer calendar file now
+10/12/15 06:07:19 PM Evaluating code organizer_events
+10/12/15 06:07:19 PM Organizer: Reading updated organizer todo file
+10/12/15 06:07:19 PM Evaluating code organizer_tasks
+10/12/15 06:07:30 PM Light set to off
+10/12/15 06:08:00 PM Light set to on
+10/12/15 06:08:30 PM Light set to off
+10/12/15 06:09:00 PM Light set to on

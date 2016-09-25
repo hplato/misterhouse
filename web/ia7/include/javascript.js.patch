@@ -1,0 +1,160 @@
+diff --git a/web/ia7/include/javascript.js b/web/ia7/include/javascript.js
+index 417dd00..7c63e87 100644
+--- a/web/ia7/include/javascript.js
++++ b/web/ia7/include/javascript.js
+@@ -1209,20 +1209,56 @@ var floorplan = function(group,time) {
+         var baseimg_width;
+         if (typeof time === 'undefined'){
+             $('#list_content').html("<div id='floorplan' class='row top-buffer'>");
++            if (true){
++                $('#floorplan').append("<center>"
++                                        + "     <input type='checkbox' id='popup' name='popup'>"
++                                        + "            popup window to copy coordinates if floorplan is clicked"
++                                        + "     </input>"
++                                        + "    &nbsp; y,x = <span id='debug_pos'></span>"
++                                        +"</center>");
++            }
+             $('#floorplan').append("<div id='graphic' class='col-sm-12 col-sm-offset-0 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2'>");
+             time = 0;
+-  		$('#graphic').prepend('<center><img id="fp_graphic" width="" src="/ia7/graphics/floorplan-'+group+'.png" /></center>');
++            $('#graphic').prepend('<center><img id="fp_graphic" width="" border="1" src="/ia7/graphics/floorplan-'+group+'.png" /></center>');
+             baseimg_width = $(window).width();
+             if (baseimg_width > 990) baseimg_width = 800;
+             $('#fp_graphic').attr("width",baseimg_width+"px");
++            $('#fp_graphic').css("border","1px solid black");
+         }
+
+         if (updateSocket !== undefined && updateSocket.readyState != 4){
+             // Only allow one update thread to run at once
+             updateSocket.abort();
+         }
++
++        $(document).mousemove(function(e){
++            var offset = $("#fp_graphic").offset();
++            var width = $("#fp_graphic").width();
++            var hight = $("#fp_graphic").height();
++            var  l = e.pageX - offset.left;
++            var  t = e.pageY - offset.top;
++            var  ok = true;
++            if (l < 0 ) { ok = false; }
++            if (t < 0 ) { ok = false; }
++            if (l > width)  { ok = false; }
++            if (t > hight)  { ok = false; }
++            if (ok === false) return;
++
++            var pos =   Math.round((t/hight) *100) +"," + Math.round((l/width)*100);
++            //console.log("floorplanpos: " + pos );
++            $('#debug_pos').text(pos);
++        });
++        $('#fp_graphic').click(function(e){
++            console.log("checked: " + $('#popup').attr("checked"));
++            if ($('#popup').is(':checked')){
++                window.prompt("Copy to clipboard: Ctrl+C, Enter", $('#debug_pos').text());
++            }
++        });
+         //resize window if changed
+         window.onresize = function(){
++
++            console.log("FLOOPLAN: window resize");
++
+             baseimg_width = $(window).width();
+             if (baseimg_width > 990) baseimg_width = 800;
+             $('#fp_graphic').attr("width",baseimg_width+"px");
+@@ -1231,9 +1267,9 @@ var floorplan = function(group,time) {
+                 var classstr = $(this).attr("class");
+                 var coords = classstr.split(/coords=/)[1];
+                 var fp_location = coords.split(/x/);
+-    		var location = get_fp_location(fp_location,0);
+-    		//alert("fp_location="+fp_location+" location="+location);
+-    		$(this).attr("style",location);
++                var l2 =  get_fp_location2(fp_location,0);
++
++                $(this).offset(l2);
+                 //iphone scale
+                 var baseimg_width = $(window).width();
+                 if (baseimg_width < 500) {
+@@ -1253,13 +1289,15 @@ var floorplan = function(group,time) {
+             url: "/LONG_POLL?json('GET','"+path_str+"','"+arg_str+"')",
+             dataType: "json",
+             success: function( json, statusText, jqXHR ) {
++                console.log("FLOOPLAN: longpoll complete");
+                 var requestTime = time;
+                 if (jqXHR.status == 200) {
+                     JSONStore(json);
+                     for (var entity in json.data) {
+                         for (var i=0 ; i < json.data[entity].fp_location.length-1; i=i+2){ //allow for multiple graphics
+                             //alert("length="+json.data[entity].fp_location.length+" i="+i+" x="+json.data[entity].fp_location[i]+" y="+json.data[entity].fp_location[i+1]+" ent_length="+$('#entity_'+entity).length);
+-    					var location = get_fp_location(json.data[entity].fp_location,i);
++                            var l2 =  get_fp_location2(json.data[entity].fp_location,i);
++                            var pos = l2.top+','+l2.left;
+                             var popover = 0;
+                             if ((json.data[entity].type == "FPCamera_Item") ||
+                                     (json_store.ia7_config.prefs.fp_state_popovers == "yes")) popover = 1
+@@ -1271,7 +1309,8 @@ var floorplan = function(group,time) {
+                             if ($('#entity_'+entity+'_'+i).length > 0) {
+                                 $('#entity_'+entity+'_'+i).attr('src',"/ia7/graphics/"+image);
+                             } else {
+-							$('#graphic').append('<img '+popover_html+' id="entity_'+entity+'_'+i+'" class="entity='+entity+'_'+i+' floorplan_item coords='+json.data[entity].fp_location[i]+'x'+json.data[entity].fp_location[i+1]+'" style="'+location+'" src="/ia7/graphics/'+image+'" />');
++                                $('#graphic').append('<img '+popover_html+' id="entity_'+entity+'_'+i+'" class="entity='+entity+'_'+i+' floorplan_item coords='+json.data[entity].fp_location[i]+'x'+json.data[entity].fp_location[i+1]+'" src="/ia7/graphics/'+image+'" />');
++                                $('#entity_'+entity+'_'+i).offset(l2);
+                                 //create_state_modal('#entity_'+entity+i,entity);
+                             }
+                             // create unique popovers for Camera items
+@@ -1301,7 +1340,8 @@ var floorplan = function(group,time) {
+                                             var fp_entity = $(this).attr("id").match(/entity_(.*)_\d+$/)[1]; //strip out entity_ and ending _X ... item names can have underscores in them.
+                                             var name = fp_entity;
+                                             if (json_store.objects[fp_entity].label !== undefined) name = json_store.objects[fp_entity].label;
+-      									return name+" - "+json_store.objects[fp_entity].state;
++                                            var ackt = +$('#entity_'+entity+'_'+i).offset(l2);
++                                            return name+"("+pos+" actual:" +ackt.top+","+ ackt.left +" ) - "+json_store.objects[fp_entity].state;
+                                         },
+                                         html: 'true', //needed to show html of course
+                                         content : function() {
+@@ -1375,30 +1415,23 @@ var floorplan = function(group,time) {
+     });
+ };
+
+-//have to figure out height, and the jumps at 991 and 1200
+-var get_fp_location = function(item,index) {
+-	var baseimg_width = $(window).width();
+-	//var baseimg_height = $(window).height() - 60;
+-	var baseimg_height = $('#fp_graphic').height();
+-	var tmargin = 0;
+-	var lmargin = 0;
+-  	//console.log("baseimg_width="+baseimg_width+"baseimg_height="+baseimg_height+" h2="+baseimg_height2);
+-  	if (baseimg_width > 990) {
+-  		lmargin = (baseimg_width - 980) / 2;
+-  		tmargin = 20;
+-  		if (baseimg_width > 1200) {
+-  			lmargin = (baseimg_width - 1180) / 2;
+-  		}
+-  		baseimg_width = 800;
+-
+-  	}
+-  	var location = "position: absolute; ";
+-  	var top = parseInt((baseimg_height * item[index] / 100)+tmargin);
+-  	var left = parseInt((baseimg_width * item[index+1] / 100)+lmargin);
+-  	//console.log("baseimg_width="+baseimg_width+" top="+top+" left="+left);
+-  	location += "top: "+top+"px;";
+-  	location += "left: "+left+"px";
+-  	return location;
++var get_fp_location2 = function(item,index) {
++    var offset = $("#fp_graphic").offset();
++    var width = $("#fp_graphic").width();
++    var hight = $("#fp_graphic").height();
++
++    var y = item[0];
++    var x = item[1];
++    var onePwidthInPx = width/100;
++    var onePhigthInPx = hight/100;
++
++    var newy = Math.round( offset.top +  y * onePhigthInPx);
++    var newx = Math.round( offset.left +  x * onePwidthInPx);
++    console.log("fpg: offset y="+offset.top+" x="+offset.left+" h="+hight+" w="+width+"");
++    return {
++        "top": newy,
++        "left": newx
++    };
+ }
+
+ var get_fp_image = function(item,size,orientation) {

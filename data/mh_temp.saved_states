@@ -1,0 +1,56 @@
+if (defined $LivingRoom) {$LivingRoom->{state} = q~member on~; $LivingRoom->{set_time} = q~1451924310~; @{$LivingRoom->{state_log}} = split($;, q~01/04/16 05:18:30 PM member on set_by=$test_light101/04/16 05:18:00 PM member off set_by=$test_light110/12/15 06:09:00 PM member on set_by=$test_light110/12/15 06:08:30 PM member off set_by=$test_light110/12/15 06:08:00 PM member on set_by=$test_light110/12/15 06:07:30 PM member off set_by=$test_light110/12/15 06:05:30 PM member on set_by=$test_light1~);} else {'var not used'}
+if (defined $All_Lights) {$All_Lights->{state} = q~member on~; $All_Lights->{set_time} = q~1451924310~; @{$All_Lights->{state_log}} = split($;, q~01/04/16 05:18:30 PM member on set_by=$test_light101/04/16 05:18:00 PM member off set_by=$test_light110/12/15 06:09:00 PM member on set_by=$test_light110/12/15 06:08:30 PM member off set_by=$test_light110/12/15 06:08:00 PM member on set_by=$test_light110/12/15 06:07:30 PM member off set_by=$test_light110/12/15 06:05:30 PM member on set_by=$test_light1~);} else {'var not used'}
+if (defined $Property) {$Property->{state} = q~member member on~; $Property->{set_time} = q~1451924310~; @{$Property->{state_log}} = split($;, q~01/04/16 05:18:30 PM member member on set_by=$LivingRoom01/04/16 05:18:00 PM member member off set_by=$LivingRoom10/12/15 06:09:00 PM member member on set_by=$LivingRoom10/12/15 06:08:30 PM member member off set_by=$LivingRoom10/12/15 06:08:00 PM member member on set_by=$LivingRoom10/12/15 06:07:30 PM member member off set_by=$LivingRoom10/12/15 06:05:30 PM member member on set_by=$LivingRoom~);} else {'var not used'}
+if (defined $organizer_vacation) {$organizer_vacation->{state} = q~inactive~; $organizer_vacation->{set_time} = q~1443361440~; @{$organizer_vacation->{state_log}} = split($;, q~09/27/15 03:44:00 PM inactive set_by=~);} else {'var not used'}
+if (defined $organizer_events) {$organizer_events->{state} = q~inactive~; $organizer_events->{set_time} = q~1443361440~; @{$organizer_events->{state_log}} = split($;, q~09/27/15 03:44:00 PM inactive set_by=~);} else {'var not used'}
+if (defined $organizer_holidays) {$organizer_holidays->{state} = q~inactive~; $organizer_holidays->{set_time} = q~1443361440~; @{$organizer_holidays->{state_log}} = split($;, q~09/27/15 03:44:00 PM inactive set_by=~);} else {'var not used'}
+if (defined $p_update_docs) {@{$p_update_docs->{cmds}} = split($;, q~update_docs~) if (!exists($p_update_docs->{cmds}));} else {'var not used'}
+if (defined $p_mhdl_page) {@{$p_mhdl_page->{cmds}} = split($;, q~get_url -quiet "https://api.github.com/repos/hollie/misterhouse/tags" "./../data/web/mh_download.html"~) if (!exists($p_mhdl_page->{cmds}));} else {'var not used'}
+if (defined $mhsend_server) {$mhsend_server->{state} = q~~; } else {'var not used'}
+if (defined $http_monitor) {$http_monitor->{state} = q~~; } else {'var not used'}
+if (defined $restart_tts) {$restart_tts->{state} = q~~; } else {'var not used'}
+if (defined $v_update_docs) {$v_update_docs->{state} = q~~; } else {'var not used'}
+if (defined $v_voice_cmds_help) {$v_voice_cmds_help->{state} = q~~; } else {'var not used'}
+if (defined $v_show_debug) {$v_show_debug->{state} = q~~; } else {'var not used'}
+if (defined $my_test1) {$my_test1->{state} = q~~; } else {'var not used'}
+if (defined $v_http_control) {$v_http_control->{state} = q~Check~; $v_http_control->{set_time} = q~1451924280~; @{$v_http_control->{state_log}} = split($;, q~01/04/16 05:18:00 PM Check set_by=time10/12/15 06:09:00 PM Check set_by=time10/12/15 06:08:00 PM Check set_by=time~);} else {'var not used'}
+if (defined $v_debug) {$v_debug->{state} = q~~; } else {'var not used'}
+if (defined $v_reboot_abort) {$v_reboot_abort->{state} = q~~; } else {'var not used'}
+if (defined $v_mode_toggle) {$v_mode_toggle->{state} = q~~; } else {'var not used'}
+if (defined $v_list_voice_cmds) {$v_list_voice_cmds->{state} = q~~; } else {'var not used'}
+if (defined $v_reboot) {$v_reboot->{state} = q~~; } else {'var not used'}
+if (defined $v_clear_cache) {$v_clear_cache->{state} = q~~; } else {'var not used'}
+if (defined $v_reload_code) {$v_reload_code->{state} = q~~; } else {'var not used'}
+if (defined $v_uptime) {$v_uptime->{state} = q~~; } else {'var not used'}
+if (defined $v_debug_toggle) {$v_debug_toggle->{state} = q~~; } else {'var not used'}
+if (defined $v_test_light2) {$v_test_light2->{state} = q~~; } else {'var not used'}
+if (defined $v_mode) {$v_mode->{state} = q~~; } else {'var not used'}
+if (defined $v_fountain) {$v_fountain->{state} = q~~; } else {'var not used'}
+if (defined $v_list_debug_options) {$v_list_debug_options->{state} = q~~; } else {'var not used'}
+if (defined $v_garage_light) {$v_garage_light->{state} = q~~; } else {'var not used'}
+if (defined $v_list_serial_items) {$v_list_serial_items->{state} = q~~; } else {'var not used'}
+if (defined $v_restart_mh) {$v_restart_mh->{state} = q~~; } else {'var not used'}
+if (defined $v_test_lights) {$v_test_lights->{state} = q~~; } else {'var not used'}
+if (defined $v_get_ical_data) {$v_get_ical_data->{state} = q~~; } else {'var not used'}
+if (defined $v_undo_last_change) {$v_undo_last_change->{state} = q~~; } else {'var not used'}
+if (defined $v_listen) {$v_listen->{state} = q~~; } else {'var not used'}
+if (defined $v_what_speed) {$v_what_speed->{state} = q~~; } else {'var not used'}
+if (defined $v_speed_benchmark) {$v_speed_benchmark->{state} = q~~; } else {'var not used'}
+if (defined $test_speak_mode) {$test_speak_mode->{state} = q~~; } else {'var not used'}
+if (defined $v_read_tables) {$v_read_tables->{state} = q~~; } else {'var not used'}
+if (defined $organizer_check) {$organizer_check->{state} = q~~; } else {'var not used'}
+if (defined $v_list_x10_items) {$v_list_x10_items->{state} = q~~; } else {'var not used'}
+if (defined $v_version) {$v_version->{state} = q~~; } else {'var not used'}
+if (defined $v_repeat_last_spoken) {$v_repeat_last_spoken->{state} = q~~; } else {'var not used'}
+if (defined $v_set_password) {$v_set_password->{state} = q~~; } else {'var not used'}
+if (defined $v_mhdl_page) {$v_mhdl_page->{state} = q~~; } else {'var not used'}
+if (defined $test_volume) {$test_volume->{state} = q~~; } else {'var not used'}
+if (defined $v_reload_code2) {$v_reload_code2->{state} = q~~; } else {'var not used'}
+if (defined $test_speech_flags) {$test_speech_flags->{state} = q~~; } else {'var not used'}
+if (defined $fountain) {$fountain->{state} = q~~; } else {'var not used'}
+if (defined $bedroom_light1) {$bedroom_light1->{resume} = q~100~; } else {'var not used'}
+if (defined $bedroom_light2) {$bedroom_light2->{resume} = q~100~; } else {'var not used'}
+if (defined $test_light1) {$test_light1->{state} = q~on~; $test_light1->{set_time} = q~1451924310~; @{$test_light1->{state_log}} = split($;, q~01/04/16 05:18:30 PM on set_by=01/04/16 05:18:00 PM off set_by=10/12/15 06:09:00 PM on set_by=10/12/15 06:08:30 PM off set_by=10/12/15 06:08:00 PM on set_by=10/12/15 06:07:30 PM off set_by=10/12/15 06:05:30 PM on set_by=~);$test_light1->{level} = q~100~; $test_light1->{resume} = q~100~; } else {'var not used'}
+if (defined $test_light2) {$test_light2->{resume} = q~100~; } else {'var not used'}
+if (defined $garage_light) {$garage_light->{resume} = q~100~; } else {'var not used'}
+if (defined $backyard_light) {$backyard_light->{resume} = q~100~; } else {'var not used'}
