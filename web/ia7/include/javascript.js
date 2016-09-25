@@ -267,12 +267,14 @@ function changePage (){
 				nav_link = '#path=/objects&parents='+nav_name;				
 				if (collection_keys_arr.length > 2 && collection_keys_arr[collection_keys_arr.length-2].substring(0,1) == "$") nav_link = '#path=/objects&type='+nav_name; 
 				if (nav_name == "Group") nav_link = '#path=objects&type=Group'; //Hardcode this use case
-				if (json_store.objects[nav_name].label !== undefined) nav_name = (json_store.objects[nav_name].label);
+				if (json_store.object && sjson_store.objects[nav_name].label !== undefined) nav_name = (json_store.objects[nav_name].label);
 
 			}
-			else {
-				nav_link = json_store.collections[collection_keys_arr[i]].link;
-				nav_name = json_store.collections[collection_keys_arr[i]].name;
+            else {
+                if (json_store.collections && collection_keys_arr[i]){
+                    nav_link = json_store.collections[collection_keys_arr[i]].link;
+                    nav_name = json_store.collections[collection_keys_arr[i]].name;
+                }
 			}
 			nav_link = buildLink (nav_link, breadcrumb + collection_keys_arr[i]);
 			breadcrumb += collection_keys_arr[i] + ",";
@@ -1690,8 +1692,8 @@ var object_history = function(items,start,days,time) {
 				
 				$('.update_history').click(function() {
 					console.log ("start="+$('.hist_start').val()+" end="+$('.hist_end').val());
-					var new_start = new Date($('.hist_start').val()).getTime();
-					var new_end = new Date($('.hist_end').val()).getTime();
+					var new_start = new Date($('.hist_start').val().split('-')).getTime();
+					var new_end = new Date($('.hist_end').val().split('-')).getTime();
 					var end_days = (new_start - new_end) / (24 * 60 * 60 * 1000)
 					new_start = new_start / 1000;
 					object_history(items,new_start,end_days);
@@ -1722,15 +1724,15 @@ var object_history = function(items,start,days,time) {
         					for (var i = 0; i < json.data.data.length; i++) {
             					if (json.data.data[i].label == key) {
                 					data.push(json.data.data[i]);
-                				return true;
+                                    return true;
            		 				}
        		 				}
     					});
     					// take away the border so that it looks better and span the graph from start to end.
     					json.data.options.grid.borderWidth = 0;
 
-    					json.data.options.xaxis.min = new Date($('.hist_end').val()).getTime();
-                		json.data.options.xaxis.max = new Date($('.hist_start').val()).getTime() + (24 * 60 * 60 * 1000);
+					json.data.options.xaxis.min = new Date($('.hist_end').val().split('-')).getTime();
+				json.data.options.xaxis.max = new Date($('.hist_start').val().split('-')).getTime() + (24 * 60 * 60 * 1000);
 //console.log("data="+JSON.stringify(data));
 //console.log("xmin="+json.data.options.xaxis.min+" xmax="+json.data.options.xaxis.max);
     					$.plot($("#hist-graph"), data, json.data.options);
