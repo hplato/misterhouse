@@ -1724,15 +1724,15 @@ var object_history = function(items,start,days,time) {
         					for (var i = 0; i < json.data.data.length; i++) {
             					if (json.data.data[i].label == key) {
                 					data.push(json.data.data[i]);
-                				return true;
+                                    return true;
            		 				}
        		 				}
     					});
     					// take away the border so that it looks better and span the graph from start to end.
     					json.data.options.grid.borderWidth = 0;
 
-    					json.data.options.xaxis.min = new Date($('.hist_end').val()).getTime();
-                		json.data.options.xaxis.max = new Date($('.hist_start').val()).getTime() + (24 * 60 * 60 * 1000);
+					json.data.options.xaxis.min = new Date($('.hist_end').val().split('-')).getTime();
+				json.data.options.xaxis.max = new Date($('.hist_start').val().split('-')).getTime() + (24 * 60 * 60 * 1000);
 //console.log("data="+JSON.stringify(data));
 //console.log("xmin="+json.data.options.xaxis.min+" xmax="+json.data.options.xaxis.max);
     					$.plot($("#hist-graph"), data, json.data.options);
