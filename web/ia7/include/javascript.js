@@ -267,12 +267,14 @@ function changePage (){
 				nav_link = '#path=/objects&parents='+nav_name;				
 				if (collection_keys_arr.length > 2 && collection_keys_arr[collection_keys_arr.length-2].substring(0,1) == "$") nav_link = '#path=/objects&type='+nav_name; 
 				if (nav_name == "Group") nav_link = '#path=objects&type=Group'; //Hardcode this use case
-				if (json_store.objects[nav_name].label !== undefined) nav_name = (json_store.objects[nav_name].label);
+				if (json_store.object && sjson_store.objects[nav_name].label !== undefined) nav_name = (json_store.objects[nav_name].label);
 
 			}
-			else {
-				nav_link = json_store.collections[collection_keys_arr[i]].link;
-				nav_name = json_store.collections[collection_keys_arr[i]].name;
+            else {
+                if (json_store.collections && collection_keys_arr[i]){
+                    nav_link = json_store.collections[collection_keys_arr[i]].link;
+                    nav_name = json_store.collections[collection_keys_arr[i]].name;
+                }
 			}
 			nav_link = buildLink (nav_link, breadcrumb + collection_keys_arr[i]);
 			breadcrumb += collection_keys_arr[i] + ",";
