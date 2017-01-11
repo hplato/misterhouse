@@ -287,12 +287,15 @@ sub json_get {
         my @round    = ();
         my @type     = ();
         my $celsius  = 0;
+	my $kph = 0;
         my $arg_time = 0;
         my $xml_info;
         $arg_time = int( $args{time}[0] ) if ( defined int( $args{time}[0] ) );
         $celsius = 1 if ( $config_parms{weather_uom_temp} eq 'C' );
-        $celsius = 1
-          if ( lc $json_data{'rrd_config'}->{'prefs'}->{'uom'} eq "celsius" );
+        $celsius = 1 if ( lc $json_data{'rrd_config'}->{'prefs'}->{'uom'} eq "celsius" );
+
+	$kph = 1 if ( $config_parms{weather_uom_wind} eq 'kph' );
+	
         my %data;
         my $end = "now";
 
@@ -374,54 +377,47 @@ sub json_get {
 
             push @defs, @xports;
             my $rrd = RRDTool::Rawish->new( rrdfile => "$path/$rrd_file" );
-            my $xml =
-              $rrd->xport( [@defs], { '--start' => $start, '--end' => $end, } );
+            my $xml = $rrd->xport( [@defs], { '--start' => $start, '--end' => $end, } );
             $xml_info = $rrd->info if ( $default_timestamp eq "true" );
             my @lines = split /\n/, $xml;
 
-            foreach my $line (@lines) {
 
-                #print "line=$line\n";
-                my ($step) = $line =~ /\<step\>(\d+)\<\/step\>/
-                  ;    #this is the width for any bar charts
-                if ($step) {
-                    for my $i ( 0 .. $#dataset ) {
-                        $dataset[$i]->{'bars'}->{'barWidth'} =
-                          int($step) * 1000
-                          if ( defined $dataset[$i]->{'bars'} );
-                    }
-                }
-                my ($time) = $line =~ /\<row\>\<t\>(\d*)\<\/t\>/;
-                $time = $time * 1000;    #javascript is in milliseconds
-                next if ( $arg_time > int($time) );    #only return new items
+	    my ($step) = $xml =~ /\<step\>(\d+)\<\/step\>/;    #this is the width for any bar charts
+
+	    if ($step) {
+		for my $i ( 0 .. $#dataset ) {
+		    $dataset[$i]->{'bars'}->{'barWidth'} =
+			int($step) * 1000
+			if ( defined $dataset[$i]->{'bars'} );
+		}
+	    }
+
+	    my $time_index=0;
+	    my ($db_start) = $xml =~ /\<start\>(\d+)\<\/start\>/ ;
+
+            foreach my $line (@lines) {
                 my (@values) = $line =~ /\<v\>(-?[e.+-\d]*|NaN)\<\/v\>/g;
-                if ($time) {
-                    my $index = 0;
-                    foreach my $value (@values) {
-                        my $value1 = sprintf( "%.10g", $value );
-                        $value1 = ( $value1 - 32 ) * ( 5 / 9 )
-                          if (  ($celsius)
-                            and ( lc $type[$index] eq "temperature" ) );
-                        $value1 =
-                          sprintf( "%." . $round[$index] . "f", $value1 )
-                          if ( defined $round[$index] );
-                        $value1 =~ s/\.0*$//
-                          unless ( $value1 == 0 )
-                          ;    #remove unneccessary trailing decimals
-                        $value1 = "null" if ( lc $value1 eq "nan" );
-                        push @{ $dataset[$index]->{data} }, [ $time, $value1 ];
-                        $index++;
-                    }
-                }
+
+		next if ( ! @values ); #skip header lines
+
+		my $index = 0;
+		foreach my $value (@values) {
+		    my $value1 = sprintf( "%.10g", $value );
+		    $value1 = ( $value1 - 32 ) * ( 5 / 9 ) if (  ($celsius) and ( lc $type[$index] eq "temperature" ) );
+		    $value1 = sprintf("%.2f",$value1 * 1.60934)  if (  ($kph) and ( lc $type[$index] eq "speed" ) );
+		    $value1 = sprintf( "%." . $round[$index] . "f", $value1 ) if ( defined $round[$index] );
+		    $value1 =~ s/\.0*$// unless ( $value1 == 0 );    #remove unneccessary trailing decimals
+		    $value1 = "null" if ( lc $value1 eq "nan" );
+		    push @{ $dataset[$index]->{data} }, [ ($db_start+($time_index*$step))*1000, $value1 ];
+		    $index++;
+		}
+		$time_index++;
             }
         }
         $data{'data'}    = \@dataset;
-        $data{'options'} = $json_data{'rrd_config'}->{'options'}
-          if ( defined $json_data{'rrd_config'}->{'options'} );
-        $data{'periods'} = $json_data{'rrd_config'}->{'periods'}
-          if ( defined $json_data{'rrd_config'}->{'periods'} );
-        $data{'last_update'} = $xml_info->{'last_update'} * 1000
-          if ( ref($xml_info) eq 'HASH' && defined $xml_info->{'last_update'} );
+        $data{'options'} = $json_data{'rrd_config'}->{'options'}    if ( defined $json_data{'rrd_config'}->{'options'} );
+        $data{'periods'} = $json_data{'rrd_config'}->{'periods'}    if ( defined $json_data{'rrd_config'}->{'periods'} );
+        $data{'last_update'} = $xml_info->{'last_update'} * 1000    if ( ref($xml_info) eq 'HASH' && defined $xml_info->{'last_update'} );
         $json_data{'rrd'} = \%data;
     }
 
