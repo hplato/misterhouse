@@ -12,6 +12,7 @@ Zoneminder servers.
     [
     	{
     		"host": "zm.server",
+            "cgipath": "/zm/",
     		"port": "9000",
     		"protocol": "ws",
     		"user": "yourusername",
@@ -27,6 +28,11 @@ Zoneminder servers.
 `host:`
 Hostname or IP of the server where zmeventserver instance is reachable.
 Falls back to 'localhost' if omitted.
+
+`cgipath:`
+directory of your zoneminder installation on the webserver. If your zoneminder webinterface is reachable with the ulr "http://zm-server/somedir/"
+set this value to "somedir"
+Can be omitted no subdirectory is used.
 
 `port:`
 Port zmeventserver is listening for web socket connections.
@@ -51,7 +57,7 @@ Falls back to 100 if omitted
 
 `timeout:`
 Specifies how long the modal dialog for a zoneminder event is displayed in
-milliseconds.
+milliseconds. If set <= 0 the modal dialog will not be dismissed automatically.
 Falls back to 5500 if omitted
 
 `debug:`
