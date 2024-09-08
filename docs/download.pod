@@ -10,13 +10,13 @@ modify the code/common/mh_release.pl file to search the new format!!
 
 =head1 Current Stable
 
-B<Version 5.0> - released on 10/31/2017
+B<Version 6.0> - released September 2024
 
 =over
 
 =item Linux, Windows and MacOS
 
-L<https://api.github.com/repos/hollie/misterhouse/zipball/v3.1>
+L<https://api.github.com/repos/hollie/misterhouse/zipball/v6.0>
 
 The Windows only compiled version of Misterhouse is sadly no longer supported.
 
